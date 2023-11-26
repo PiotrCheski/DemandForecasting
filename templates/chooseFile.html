@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Dodaj nowy plik</title>
+{% endblock %}
+
+{% block body %}
+<div class="send-file">
+    <form action="/send_file" method="post" enctype="multipart/form-data">
+        <div class="file-input-container">
+            <label for="file-upload" class="custom-file-upload">
+                Wybierz plik
+            </label>            
+            <input type="file" id="file-upload" type="file" name="file" class="form-control-file" onchange="updateFileInfo()">
+            <div class="file-input-info" id="fileInfo">Nie wybrano pliku</div>
+        </div>
+        <button>PRZEŚLIJ<br>SWOJE DANE</button>
+    </form>
+</div>
+<script src="{{url_for('static', filename='scripts/customInputFile.js')}}"></script>
+
+{% endblock %}

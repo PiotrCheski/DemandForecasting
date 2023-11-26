@@ -16,7 +16,9 @@ def index():
 def senf_file():
     if 'file' in request.files:
         file = request.files['file']
+        print(file)
         filename = secure_filename(file.filename)
+        print(filename)
         file.save("static/uploads/"+filename)
         return redirect("/")
     else:
@@ -31,6 +33,18 @@ def open_how_we_work():
 @app.route("/how_we_work", methods=["GET"])
 def howWeWork():
     return render_template("howWeWork.html")
+
+
+
+# Obsłużenie żądania przycisku open_how_we_work
+@app.route("/open_choose_file", methods=["POST"])
+def open_choose_file():
+    return redirect(url_for("chooseFile"))
+
+# Funkcja opisująca stronę hoWeWork
+@app.route("/choose_file", methods=["GET"])
+def chooseFile():
+    return render_template("chooseFile.html")
 
 # Obsłużenie żądania przycisku open_how_we_work
 @app.route("/explore_your_files", methods=["POST"])

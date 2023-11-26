@@ -201,3 +201,30 @@ h1 {
 
 
 
+
+input[type="file"] {
+    display: none;
+}
+
+.file-input-container {
+    background: #fff;
+    display: flex;
+    align-items: center;
+    width: 300px; /* Dostosuj szerokość prostokąta według potrzeb */
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.custom-file-upload {
+    background: #5c78a3;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+
+
+.file-input-info {
+    margin-left: 10px;
+}
+
