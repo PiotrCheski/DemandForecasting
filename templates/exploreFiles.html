@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Twój plik</title>
+{% endblock %}
+
+{% block body %}
+<ul class="file-list">
+    {% for file in files %}
+        <li class="file-item">
+            <div class="file-container">
+                <div class="file-rectangle">
+                    <a href="{{ url_for('see_specific_file', file_name=file) }}" class="file-link">{{ file }}</a>
+                </div>
+                <div class="delete-container">
+                    <a href="#" class="delete-link">Usuń</a>
+                </div>
+            </div>
+        </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

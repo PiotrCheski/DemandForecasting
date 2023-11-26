@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Prognozator Popytu</title>
+{% endblock %}
+
+{% block body %}
+<div class="quarter-circle"></div>
+    <div class="title-main-page">
+    <h1>PROGNOZOWANIE<br>POPYTU</h1>
+    </div>
+
+    <div class="buttons-main-page">
+        <form action="/open_how_we_work" method="post">    
+            <button>JAK DZIAŁAMY</button>
+        </form>
+
+        <form action="/send_file" method="post" enctype="multipart/form-data">
+            <!--
+            <label for="file">Wybierz plik CSV</label>
+            <input type="file" class="form-control-file" id="file" name="file" label="tekst">
+            -->
+            <button>PRZEŚLIJ<br>SWOJE DANE</button>
+        </form>
+
+        <form action="/explore_your_files" method="post">    
+            <button>WYŚWIETL<br>SWOJE DANE</button>
+        </form>
+    </div>
+{% endblock %}

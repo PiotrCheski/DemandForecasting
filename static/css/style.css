@@ -1,0 +1,203 @@
+body {
+    font-family: 'Karla';
+    margin: 0;
+    overflow: hidden;
+    background-color: #5c78a3;
+
+}
+
+.hamburger-menu {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    padding-top: 20px;
+    padding-right: 40px;
+    right: 10px; /* Adjust the right value as needed */
+    position: fixed; /* Use fixed positioning */
+    top: 10px; /* Adjust the top value as needed */
+    z-index: 1000; /* Ensure it's above other elements */
+}
+
+.bar {
+    width: 40px;
+    height: 5px;
+    background-color: #fff; /* Change to a color that contrasts with your background */
+    margin: 4px 0;
+    transition: 0.4s;
+}
+
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    right: -500px; /* Start off-screen to the right */
+    height: 100%;
+    width: 500px; /* Adjust the width as needed */
+    background-color: #fff;
+    transition: right 0.4s ease; /* Transition the 'right' property */
+    z-index: 1001;
+}
+
+.menu-content {
+    transform: translateY(60%);
+    text-align: center;
+
+}
+
+.menu-content p {
+    color: #000;
+    font-weight: bold;
+    font-size: 25px;
+    margin-bottom: 40px;
+}
+
+.menu-content a {
+    text-decoration: none;
+    color: #000;
+
+}
+
+.show-menu {
+    right: 0; /* Move the menu to the visible part of the screen */
+} /* Add other styles for the open menu */
+
+
+h1 {
+    color: #fff;
+    font-size: 70px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.quarter-circle {
+    width: 150px;
+    height: 150px;
+    background-color: #fff; /* You can change the color */
+    border-radius: 0 0 100% 0; /* This creates the left-bottom quadrant */
+    overflow: hidden; /* Hides the other quadrants */
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.title-main-page {
+    position: absolute;
+    top: 50%;
+    left: 3%; /* Adjust the left value as needed */
+    transform: translateY(-40%);
+}
+
+.buttons-main-page {
+    position: absolute;
+    top: 50%;
+    right: 10%;
+    transform: translateY(-40%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    z-index: 1;
+}
+
+.buttons-main-page form {
+    margin-bottom: 60px;
+}
+
+.buttons-main-page button {
+    width: 250px;
+    height: 60px;
+    padding: 10px;
+    background-color: #fff;
+    color: #000;
+    border: 2px solid #fff;
+    border-radius: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 15px;
+    letter-spacing: 2px;
+}
+.buttons-main-page button span {
+    /* Optionally, you can use a <span> to apply styles to the text explicitly */
+    width: 100%; /* Ensure the span takes up the full width */
+    text-align: center;
+}
+
+
+
+.how-we-work {
+    display: flex;
+}
+
+.column {
+    flex: 1;
+    padding: 20px;
+}
+
+.column:nth-child(odd) {
+    transform: translateY(50%);
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: #fff;
+    font-weight: bold;
+    text-align: justify;
+    font-size: 25px;
+}
+
+
+.file-list {
+    margin-top: 100px;
+    list-style-type: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Three equal columns */
+    gap: 20px; /* Adjust the gap between items as needed */
+}
+
+.file-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.file-rectangle {
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 100px;
+    width: 200px; /* Set a fixed width for both elements */
+    background-color: #fff; /* White background */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center text horizontally */
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.delete-link {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    height:20px;
+    width: 200px; /* Set a fixed width for both elements */
+    background-color: #f14444; /* White background */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center text horizontally */
+    font-weight: bold;
+    margin-bottom: 30px;
+
+
+}
+
+.file-link,
+.delete-link {
+    text-decoration: none;
+    color: #000; /* Adjust the text color as needed */
+    cursor: pointer;
+}
+
+
+

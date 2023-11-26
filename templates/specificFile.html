@@ -1,0 +1,25 @@
+<h1 class="">Dane dotyczące sprzedaży z pliku {{file_name}}</h1>
+<table class="">
+    <thead>
+        <tr>
+            <th>Okres</th>
+            <th>Wartosci</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        {% for row in data %}
+            <tr>
+                <td>{{ row['Okres'] }}</td>
+                <td>{{ row['Wartosci'] }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="container mt-4">
+    <h1 class="display-5">Prognoza popytu dla kolejnego miesiąca metodą średnich stałych</h1>
+    <div class="my-4">
+      <h3 class="display-6">Prognoza: {{average}}</h3>
+    </div>
+</div>
