@@ -5,30 +5,30 @@
 {% endblock %}
 
 {% block body %}
-<h1 class="">Dane dotyczące sprzedaży z pliku {{file_name}}</h1>
-<table class="">
-    <thead>
-        <tr>
-            <th>Okres</th>
-            <th>Wartosci</th>
-        </tr>
-
-    </thead>
-    <tbody>
-        {% for row in data %}
-            <tr>
-                <td>{{ row['Okres'] }}</td>
-                <td>{{ row['Wartosci'] }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<div class="">
-    <h1 class="">Prognoza popytu dla kolejnego miesiąca metodą średnich stałych</h1>
-    <div class="">
-      <h3 class="">Prognoza: {{average}}</h3>
+<div class="specific-file">
+    <h1 class="">Dane dotyczące sprzedaży z pliku {{file_name}}</h1>
+    <div class="details-table">
+        <table class="">
+            <thead>
+                <tr>
+                    <th>Okres</th>
+                    <th>Wartości</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                    <tr>
+                        <td>{{ row['Okres'] }}</td>
+                        <td>{{ row['Wartosci'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+
+    <h1>Prognoza popytu dla kolejnego miesiąca metodą średnich stałych</h1>
+    <h3>Prognoza: {{average}}</h3>
+
 </div>
 {% endblock %}
 

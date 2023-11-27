@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block body %}
+{% if files %}
 <ul class="file-list">
     {% for file in files %}
         <li class="file-item">
@@ -13,11 +14,17 @@
                     <a href="{{ url_for('see_specific_file', file_name=file) }}" class="file-link">{{ file }}</a>
                 </div>
                 <div class="delete-container">
-                    <a href="{{ url_for('delete_file', file_name=file) }}" class="delete-link" onclick="return confirm('Are you sure you want to delete this file?')">Usuń</a>
+                    <a href="{{ url_for('delete_file', file_name=file) }}" class="delete-link" onclick="return confirm('Czy na pewno chcesz usunąć plik {{file}}?')">Usuń</a>
                 </div>
             </div>
         </li>
     {% endfor %}
 </ul>
+{% else %}
+<div class="explore-files">
+<h1>Brak danych</h1>
+</div>
+{% endif %}
+
 
 {% endblock %}

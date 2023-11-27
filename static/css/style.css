@@ -1,9 +1,8 @@
 body {
     font-family: 'Karla';
     margin: 0;
-    overflow: hidden;
     background-color: #5c78a3;
-
+    overflow: auto;
 }
 
 .hamburger-menu {
@@ -27,6 +26,7 @@ body {
 }
 
 .menu-overlay {
+    overflow: hidden;
     position: fixed;
     top: 0;
     right: -500px; /* Start off-screen to the right */
@@ -38,6 +38,7 @@ body {
 }
 
 .menu-content {
+    overflow: hidden;
     transform: translateY(60%);
     text-align: center;
 
@@ -200,8 +201,6 @@ h1 {
 }
 
 
-
-
 .send-file {
     display: flex;
     align-items: center;
@@ -254,3 +253,48 @@ input[type="file"] {
     margin-left: 10px;
 }
 
+
+.specific-file {
+    margin-top: 100px;
+    text-align: center;
+}
+
+.specific-file h1 {
+    font-size: 20px;
+}
+
+.details-table {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.details-table table {
+    /* Your existing table styles go here */
+    width: 40%; /* Adjust the width as needed */
+    margin: auto; /* Center the table horizontally */
+    border-collapse: collapse;
+}
+
+.details-table thead {
+    background-color: #f2f2f2; /* Example background color for the header */
+}
+
+.details-table th, td {
+    border: 1px solid #ddd; /* Example border styling */
+    padding: 4px; /* Example padding */
+    text-align: center;
+}
+
+
+.explore-files {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center horizontally */
+    height: 100vh; /* You can adjust the height based on your layout */
+}
+
+.explore-files h1 {
+    text-align: center;
+}

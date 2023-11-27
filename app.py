@@ -19,7 +19,7 @@ def senf_file():
         filename = secure_filename(file.filename)
         print(filename)
         file.save("static/uploads/"+filename)
-        return redirect("/")
+        return redirect(url_for("explore_files"))
     else:
         return "No file"
 
