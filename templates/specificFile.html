@@ -1,3 +1,10 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Dane z pliku {{file_name}}</title>
+{% endblock %}
+
+{% block body %}
 <h1 class="">Dane dotyczące sprzedaży z pliku {{file_name}}</h1>
 <table class="">
     <thead>
@@ -17,9 +24,14 @@
     </tbody>
 </table>
 
-<div class="container mt-4">
-    <h1 class="display-5">Prognoza popytu dla kolejnego miesiąca metodą średnich stałych</h1>
-    <div class="my-4">
-      <h3 class="display-6">Prognoza: {{average}}</h3>
+<div class="">
+    <h1 class="">Prognoza popytu dla kolejnego miesiąca metodą średnich stałych</h1>
+    <div class="">
+      <h3 class="">Prognoza: {{average}}</h3>
     </div>
 </div>
+{% endblock %}
+
+
+
+

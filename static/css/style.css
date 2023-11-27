@@ -202,6 +202,32 @@ h1 {
 
 
 
+.send-file {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.send-file {
+    text-align: center;
+}
+
+.send-file button {
+    width: 500px;
+    height: 60px;
+    margin-top: 15px; /* Adjust as needed */
+    background-color: #fff;
+    color: #000;
+    border: 2px solid #fff;
+    border-radius: 40px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+    letter-spacing: 2px;
+}
+
 input[type="file"] {
     display: none;
 }
@@ -210,19 +236,19 @@ input[type="file"] {
     background: #fff;
     display: flex;
     align-items: center;
-    width: 300px; /* Dostosuj szerokość prostokąta według potrzeb */
-    padding: 10px;
-    margin-bottom: 20px;
+    width: 500px; /* Dostosuj szerokość prostokąta według potrzeb */
+    height: 60px;
+
 }
 
 .custom-file-upload {
+    margin-left: 10px;
+    color: #fff;
     background: #5c78a3;
     display: inline-block;
     padding: 6px 12px;
     cursor: pointer;
 }
-
-
 
 .file-input-info {
     margin-left: 10px;
