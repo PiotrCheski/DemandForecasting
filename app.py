@@ -5,7 +5,6 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-
 # Funkcja opisująca główną stronę 
 @app.route("/", methods=["GET"])
 def index():
@@ -34,8 +33,6 @@ def open_how_we_work():
 def howWeWork():
     return render_template("howWeWork.html")
 
-
-
 # Obsłużenie żądania przycisku open_how_we_work
 @app.route("/open_choose_file", methods=["POST"])
 def open_choose_file():
@@ -52,7 +49,7 @@ def explore_your_files():
     return redirect(url_for("explore_files"))
 
 # Funkcja opisująca stronę hoWeWork
-@app.route("/explore_files", methods=["GET"])
+@app.route("/explore_files", methods=["GET", "POST"])
 def explore_files():
     # Lista plików w folderze static/uploads
     files = os.listdir("static/uploads")
@@ -75,6 +72,13 @@ def see_specific_file(file_name):
                            file_name=file_name, 
                            data=data.to_dict(orient='records'),
                            average=average)
+
+
+@app.route('/delete_file/<file_name>', methods=['GET', 'POST'])
+def delete_file(file_name):
+    file_path = 'static/uploads/' + file_name
+    os.remove(file_path)
+    return redirect(url_for("explore_files"))
 
 # Funkcja licząca średnią z zestawu danych dla kolumny "Wartosci"
 def calculate_avg(data):
