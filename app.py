@@ -66,12 +66,27 @@ def see_specific_file(file_name):
     data = pd.read_csv(file_path)
 
     # Obliczenie średniej
-    average = round(calculate_avg(data))
+    average = calculate_avg(data)
+
+    moving_avg_n3 = calculate_moving_avg(data, 3)
+    moving_avg_n6 = calculate_moving_avg(data, 6)
+    moving_avg_n9 = calculate_moving_avg(data, 9)
+
+    smoothed_values_010 = calculate_exp_smoothing(data, 0.10)
+    smoothed_values_015 = calculate_exp_smoothing(data, 0.15)
+    smoothed_values_020 = calculate_exp_smoothing(data, 0.20)
+
 
     return render_template("specificFile.html", 
                            file_name=file_name, 
                            data=data.to_dict(orient='records'),
-                           average=average)
+                           average=average,
+                           moving_avg_n3=moving_avg_n3,
+                           moving_avg_n6=moving_avg_n6,
+                           moving_avg_n9=moving_avg_n9,
+                           smoothed_values_010=smoothed_values_010,
+                           smoothed_values_015=smoothed_values_015,
+                           smoothed_values_020=smoothed_values_020)
 
 
 @app.route('/delete_file/<file_name>', methods=['GET', 'POST'])
@@ -82,7 +97,36 @@ def delete_file(file_name):
 
 # Funkcja licząca średnią z zestawu danych dla kolumny "Wartosci"
 def calculate_avg(data):
-    return data["Wartosci"].mean()
+    return round(data["Wartosci"].mean())
+
+def calculate_moving_avg(data, n):
+    data = data["Wartosci"]
+    moving_averages = []
+
+    for i in range(len(data) - n + 1):
+        window = data.iloc[i : i + n]
+        avg = round(window.mean())
+        moving_averages.append(avg)
+
+    return moving_averages
+
+def calculate_exp_smoothing(data, alfa):
+    data = data["Wartosci"]
+    smoothed_values = [130]  # Initialize with the first value
+
+    for i in range(1, len(data)):
+        smoothed_value = round(alfa * data[i] + (1 - alfa) * smoothed_values[-1])
+        smoothed_values.append(smoothed_value)
+
+    return smoothed_values
+
+def params_linear_regression(data):
+    n = len(data)
+    sum_x = sum(data["Okres"])
+    sum_y = sum(data["Wartosci"])
+    sum_x2 = sum(data["Okres"]**2)
+    sum_y2 = sum(data["Wartosci"]**2)
+    return n, sum_x, sum_y, sum_x2, sum_y2
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -25,9 +25,100 @@
             </tbody>
         </table>
     </div>
-
+    <h3>Tutaj będzie wykres</h3>
     <h1>Prognoza popytu dla kolejnego miesiąca metodą średnich stałych</h1>
-    <h3>Prognoza: {{average}}</h3>
+    <div class="details-table">
+        <table class="">
+            <thead>
+                <tr>
+                    <th>Okres</th>
+                    <th>Wartości</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                    <tr>
+                        <td>{{ row['Okres'] }}</td>
+                        <td>{{ row['Wartosci'] }}</td>
+                    </tr>
+                {% endfor %}
+                <tr class="prediction">
+                    <td>{{data|length + 1}}</td>
+                    <td>{{ average }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Tutaj będzie wykres</h3>
+    <h1>Prognoza popytu dla kolejnego miesiąca metodą średnich ruchomych</h1>
+    <div class="details-table">
+        <table class="">
+            <thead>
+                <tr>
+                    <th>Okres</th>
+                    <th>Wartości</th>
+                    <th>n3</th>
+                    <th>n6</th>
+                    <th>n9</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                    <tr>
+                        <td>{{ row['Okres'] }}</td>
+                        <td>{{ row['Wartosci'] }}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                {% endfor %}
+                <tr class="prediction">
+                    <td>{{data|length + 1}}</td>
+                    <td>-</td>
+                    <td>{{moving_avg_n3[-1]}}</td>
+                    <td>{{moving_avg_n6[-1]}}</td>
+                    <td>{{moving_avg_n9[-1]}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h3>Tutaj będzie wykres</h3>
+
+    <h1>Prognoza popytu dla kolejnego miesiąca metodą wygładzenia wykładniczego</h1>
+    <div class="details-table">
+        <table class="">
+            <thead>
+                <tr>
+                    <th>Okres</th>
+                    <th>Wartości</th>
+                    <th>alfa0,1</th>
+                    <th>alfa0,15</th>
+                    <th>alfa0,20</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                    <tr>
+                        <td>{{ row['Okres'] }}</td>
+                        <td>{{ row['Wartosci'] }}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                {% endfor %}
+                <tr class="prediction">
+                    <td>{{data|length + 1}}</td>
+                    <td>-</td>
+                    <td>{{smoothed_values_010[-1]}}</td>
+                    <td>{{smoothed_values_015[-1]}}</td>
+                    <td>{{smoothed_values_020[-1]}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h3>Tutaj będzie wykres</h3>
+    <h1>Prognoza popytu dla kolejnego miesiąca za pomocą modelu sezonowości i trendu, używając regresji liniowej do znalezienia podstawowego trendu:</h1>
 
 </div>
 {% endblock %}

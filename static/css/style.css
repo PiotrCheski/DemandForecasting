@@ -298,3 +298,9 @@ input[type="file"] {
 .explore-files h1 {
     text-align: center;
 }
+
+
+.prediction {
+    background-color: yellow;
+    color: black;
+}
