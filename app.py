@@ -2,6 +2,8 @@ import os
 import pandas as pd
 from flask import Flask, render_template, redirect, url_for, request
 from werkzeug.utils import secure_filename
+import matplotlib.pyplot as plt
+import io, base64
 
 app = Flask(__name__)
 
@@ -76,6 +78,7 @@ def see_specific_file(file_name):
     smoothed_values_015 = calculate_exp_smoothing(data, 0.15)
     smoothed_values_020 = calculate_exp_smoothing(data, 0.20)
 
+    chart = generate_chart(data)
 
     return render_template("specificFile.html", 
                            file_name=file_name, 
@@ -86,7 +89,8 @@ def see_specific_file(file_name):
                            moving_avg_n9=moving_avg_n9,
                            smoothed_values_010=smoothed_values_010,
                            smoothed_values_015=smoothed_values_015,
-                           smoothed_values_020=smoothed_values_020)
+                           smoothed_values_020=smoothed_values_020, 
+                           chart=chart)
 
 
 @app.route('/delete_file/<file_name>', methods=['GET', 'POST'])
@@ -127,6 +131,19 @@ def params_linear_regression(data):
     sum_x2 = sum(data["Okres"]**2)
     sum_y2 = sum(data["Wartosci"]**2)
     return n, sum_x, sum_y, sum_x2, sum_y2
+
+def generate_chart(data):
+    plt.plot(data['Okres'], data['Wartosci'], marker='o', linestyle='None', markersize=1, color='blue')
+    # Dodaj etykiety osi
+    plt.xlabel('Okress]', fontsize=14)
+    plt.ylabel('Wartość', fontsize=14)
+    obraz = io.BytesIO()
+    plt.savefig(obraz, format='png')   
+    obraz.seek(0)
+    obraz64 = obraz.read()
+    obraz64 = base64.b64encode(obraz64)
+    obraz64 = obraz64.decode()
+    return obraz64
 
 if __name__ == "__main__":
     app.run(debug=True)
