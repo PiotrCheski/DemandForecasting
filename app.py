@@ -201,7 +201,7 @@ def calculate_forecast_linear_regression(data, a, b):
 
 def generate_chart(data, isAverage=None, isAverageMoving=None, isExponentialSmoothing=None, isLinearRegression=None, a=None, b=None):
     fig, ax = plt.subplots()
-
+    fig.set_size_inches(10, 6)
     # Set the background color for the figure and axis
     fig.set_facecolor('#5c78a3')
     ax.set_facecolor('#5c78a3')

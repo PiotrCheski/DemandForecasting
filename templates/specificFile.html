@@ -12,7 +12,7 @@
             <thead>
                 <tr>
                     <th>Okres</th>
-                    <th>Wartości</th>
+                    <th>Wartość sprzedaży [szt./m-c]</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,7 +32,7 @@
             <thead>
                 <tr>
                     <th>Okres</th>
-                    <th>Wartości</th>
+                    <th>Wartość sprzedaży [szt./m-c]</th>
                 </tr>
             </thead>
             <tbody>
@@ -57,10 +57,10 @@
             <thead>
                 <tr>
                     <th>Okres</th>
-                    <th>Wartości</th>
-                    <th>n3</th>
-                    <th>n6</th>
-                    <th>n9</th>
+                    <th>Wartość sprzedaży [szt./m-c]</th>
+                    <th>n = 3</th>
+                    <th>n = 6</th>
+                    <th>n = 9</th>
                 </tr>
             </thead>
             <tbody>
@@ -87,14 +87,14 @@
 
     <h1>Prognoza popytu dla kolejnego miesiąca metodą wygładzenia wykładniczego</h1>
     <div class="details-table">
-        <table class="">
+        <table>
             <thead>
                 <tr>
                     <th>Okres</th>
-                    <th>Wartości</th>
-                    <th>alfa0,1</th>
-                    <th>alfa0,15</th>
-                    <th>alfa0,20</th>
+                    <th>Wartość sprzedaży [szt./m-c]</th>
+                    <th>α = 0,1</th>
+                    <th>α = 0,15</th>
+                    <th>α = 0,20</th>
                 </tr>
             </thead>
             <tbody>
@@ -118,13 +118,13 @@
         </table>
     </div>
     <img src="data:image/png;base64, {{chart_exponential_smoothing}}">    
-    <h1>Prognoza popytu dla kolejnego miesiąca za pomocą modelu sezonowości i trendu, używając regresji liniowej do znalezienia podstawowego trendu:</h1>
+    <h1>Prognoza popytu dla kolejnego miesiąca za pomocą regresji liniowej</h1>
     <div class="details-table">
         <table class="">
             <thead>
                 <tr>
                     <th>Okres</th>
-                    <th>Wartości</th>
+                    <th>Wartość sprzedaży [szt./m-c]</th>
                 </tr>
             </thead>
             <tbody>
@@ -141,7 +141,51 @@
             </tbody>
         </table>
     </div>
-    <img src="data:image/png;base64, {{chart_linear_regression}}">    
+    <img src="data:image/png;base64, {{chart_linear_regression}}">
+        <h1>Podsumowanie</h1>
+            <div class="details-table">
+                <table>
+                    <tr>
+                    <th colspan="2">Metoda</th>
+                    <th>Prognoza dla okresu {{data|length + 1}} [szt/m-c]</th>
+                    </tr>
+                    <tr>
+                    <td rowspan="1" colspan="2">Metoda średniej stałej</td>
+                    <td>{{ average }}</td>
+                    </tr>
+                    <tr>
+                    <td rowspan="3">Metoda średniej ruchomej</td>
+                    <td>n = 3</td>
+                    <td>{{moving_avg_n3[-1]}}</td>
+                    </tr>
+                    <tr>
+                    <td>n = 6</td>
+                    <td>{{moving_avg_n6[-1]}}</td>
+                    </tr>
+                    <tr>
+                    <td>n = 9</td>
+                    <td>{{moving_avg_n9[-1]}}</td>
+                    </tr>
+                    <tr>
+                    <td rowspan="3">Metoda wygładzania wykładniczego</td>
+                    <td>α = 0,1</td>
+                    <td>{{smoothed_values_010[-1]}}</td>
+                    </tr>
+                    <tr>
+                    <td>α = 0,15</td>
+                    <td>{{smoothed_values_015[-1]}}</td>
+                    </tr>
+                    <tr>
+                    <td>α = 0,20</td>
+                    <td>{{smoothed_values_020[-1]}}</td>
+                    </tr>
+                    <tr>
+                    <td rowspan="1" colspan="2">Metoda regresji liniowej</td>
+                    <td>{{ forecast_linear_regression }}</td>
+                    </tr>
+                </table>
+            </div>
+            <br>
 </div>
 {% endblock %}
 
