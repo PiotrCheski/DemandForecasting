@@ -81,6 +81,9 @@ def see_specific_file(file_name):
     smoothed_values_015 = calculate_exp_smoothing(data, 0.15)
     smoothed_values_020 = calculate_exp_smoothing(data, 0.20)
 
+    a, b = params_linear_regression(data)
+    forecast_linear_regression = round(calculate_forecast_linear_regression(data, a, b))
+
     # Wykres dla oryginalnego zestawu danych
     chart_data = generate_chart(data)
 
@@ -102,8 +105,31 @@ def see_specific_file(file_name):
     data_moving.loc[next_month_index, 'n3'] = moving_avg_n3[-1]
     data_moving.loc[next_month_index, 'n6'] = moving_avg_n6[-1]
     data_moving.loc[next_month_index, 'n9'] = moving_avg_n9[-1]
-    print(data_moving)
+
     chart_moving = generate_chart(data_moving, isAverageMoving=True)
+
+    # Wykres dla prognozy metodą wygładzenia wykładniczego
+    data_exponential_smoothing = data.copy()
+    next_month_index = data_exponential_smoothing.index.max() + 1
+    data_exponential_smoothing.loc[next_month_index, 'Okres'] = data_exponential_smoothing['Okres'].max() + 1
+
+    data_exponential_smoothing["010"] = data_exponential_smoothing["Wartosci"]
+    data_exponential_smoothing["015"] = data_exponential_smoothing["Wartosci"]
+    data_exponential_smoothing["020"] = data_exponential_smoothing["Wartosci"]
+
+    data_exponential_smoothing.loc[next_month_index, "010"] = smoothed_values_010[-1]
+    data_exponential_smoothing.loc[next_month_index, "015"] = smoothed_values_015[-1]
+    data_exponential_smoothing.loc[next_month_index, "020"] = smoothed_values_020[-1]
+
+    chart_exponential_smoothing = generate_chart(data_exponential_smoothing, isExponentialSmoothing=True)
+
+    # Wykres dla regresji liniowej
+    data_linear_regression = data.copy()
+    next_month_index = data_linear_regression.index.max() + 1
+    data_linear_regression.loc[next_month_index, 'Okres'] = data_linear_regression['Okres'].max() + 1
+    data_linear_regression.loc[next_month_index, 'Wartosci'] = forecast_linear_regression
+    chart_linear_regression = generate_chart(data_linear_regression, isLinearRegression=True, a=a, b=b)
+
 
     return render_template("specificFile.html", 
                            file_name=file_name, 
@@ -114,10 +140,13 @@ def see_specific_file(file_name):
                            moving_avg_n9=moving_avg_n9,
                            smoothed_values_010=smoothed_values_010,
                            smoothed_values_015=smoothed_values_015,
-                           smoothed_values_020=smoothed_values_020, 
+                           smoothed_values_020=smoothed_values_020,
+                           forecast_linear_regression=forecast_linear_regression, 
                            chart_data=chart_data,
                            chart_average=chart_average,
-                           chart_moving=chart_moving
+                           chart_moving=chart_moving,
+                           chart_exponential_smoothing=chart_exponential_smoothing,
+                           chart_linear_regression=chart_linear_regression
                            )
 
 
@@ -157,10 +186,20 @@ def params_linear_regression(data):
     sum_x = sum(data["Okres"])
     sum_y = sum(data["Wartosci"])
     sum_x2 = sum(data["Okres"]**2)
-    sum_y2 = sum(data["Wartosci"]**2)
-    return n, sum_x, sum_y, sum_x2, sum_y2
+    sum_xy = sum(data["Okres"]*data["Wartosci"])
+    
 
-def generate_chart(data, isAverage=None, isAverageMoving=None):
+    a = (n * sum_xy - sum_x*sum_y) / (n * sum_x2 - sum_x**2)
+    b = (sum_y/n) - (a*(sum_x)/n)
+    return a, b
+
+def calculate_forecast_linear_regression(data, a, b):
+    n = len(data)
+    forecast_linear_regression = (n+1) * a + b
+    return forecast_linear_regression
+
+
+def generate_chart(data, isAverage=None, isAverageMoving=None, isExponentialSmoothing=None, isLinearRegression=None, a=None, b=None):
     fig, ax = plt.subplots()
 
     # Set the background color for the figure and axis
@@ -168,28 +207,52 @@ def generate_chart(data, isAverage=None, isAverageMoving=None):
     ax.set_facecolor('#5c78a3')
 
     # Create a bar chart
-    plt.plot(data['Okres'], data['Wartosci'], marker='o', linestyle='-', markersize=5, color='#00cc00')
+    plt.plot(data['Okres'], data['Wartosci'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
+    plt.scatter(data['Okres'], data['Wartosci'], color='white', s=50, zorder=10)
+
     if isAverage==True:
-            # Color the last point in yellow
-            plt.scatter(data['Okres'].iloc[-1], data['Wartosci'].iloc[-1], color='yellow', s=50, zorder=10)
-    # Add labels to the axes
+            plt.scatter(data['Okres'].iloc[-1], data['Wartosci'].iloc[-1], color='yellow', s=70, zorder=10)
+
+    if isAverageMoving==True:
+        plt.plot(data['Okres'], data['n3'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
+        plt.scatter(data['Okres'].iloc[-1], data['n3'].iloc[-1], color='yellow', s=70, zorder=10)
+
+        plt.plot(data['Okres'], data['n6'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
+        plt.scatter(data['Okres'].iloc[-1], data['n6'].iloc[-1], color='red', s=70, zorder=10)
+
+        plt.plot(data['Okres'], data['n9'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
+        plt.scatter(data['Okres'].iloc[-1], data['n9'].iloc[-1], color='#B15EFF', s=70, zorder=10)
+
+    if isExponentialSmoothing==True:
+        plt.plot(data['Okres'], data['010'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
+        plt.scatter(data['Okres'].iloc[-1], data['010'].iloc[-1], color='yellow', s=70, zorder=10)
+
+        plt.plot(data['Okres'], data['015'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
+        plt.scatter(data['Okres'].iloc[-1], data['015'].iloc[-1], color='red', s=70, zorder=10)
+
+        plt.plot(data['Okres'], data['020'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
+        plt.scatter(data['Okres'].iloc[-1], data['020'].iloc[-1], color='#B15EFF', s=70, zorder=10) 
+
+    if isLinearRegression==True:
+            plt.scatter(data['Okres'].iloc[-1], data['Wartosci'].iloc[-1], color='yellow', s=70, zorder=10)
+            x_values = range(1, len(data) + 1)
+            y_values = [a * x + b for x in x_values]
+            plt.plot(x_values, y_values, color="red", label="Linia trendu")
+            
+
     plt.xlabel('Okres', fontsize=14)
     plt.ylabel('Wartość', fontsize=14)
 
-    # Set x-axis ticks to display all values
-    plt.xticks(data['Okres'])  # Adjust rotation and ha as needed
+    plt.xticks(data['Okres'])
     max_value = max(data['Wartosci'])
     y_ticks = np.arange(0, 1.1*max_value, 50)
     plt.yticks(y_ticks)
-    plt.grid(True, linestyle='--', alpha=0.7)
-    # Save the figure to a BytesIO object
+    plt.grid(True, linestyle='--', alpha=0.7, color='white')
     obraz = io.BytesIO()
     plt.savefig(obraz, format='png')
     obraz.seek(0)
-    # Convert the image to base64
     obraz64 = base64.b64encode(obraz.read()).decode()
 
-    # Close the figure to free up resources
     plt.close(fig)
 
     return obraz64

@@ -304,3 +304,23 @@ input[type="file"] {
     background-color: yellow;
     color: black;
 }
+
+.prediction .n6 {
+    background-color: red;
+    color: black;
+}
+
+.prediction .n9 {
+    background-color: #B15EFF;
+    color: black;
+}
+
+.prediction .expsmooth015 {
+    background-color: red;
+    color: black;
+}
+
+.prediction .expsmooth020 {
+    background-color: #B15EFF;
+    color: black;
+}
