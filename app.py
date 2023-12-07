@@ -188,7 +188,6 @@ def params_linear_regression(data):
     sum_x2 = sum(data["Okres"]**2)
     sum_xy = sum(data["Okres"]*data["Wartosci"])
     
-
     a = (n * sum_xy - sum_x*sum_y) / (n * sum_x2 - sum_x**2)
     b = (sum_y/n) - (a*(sum_x)/n)
     return a, b
@@ -197,7 +196,6 @@ def calculate_forecast_linear_regression(data, a, b):
     n = len(data)
     forecast_linear_regression = (n+1) * a + b
     return forecast_linear_regression
-
 
 def generate_chart(data, isAverage=None, isAverageMoving=None, isExponentialSmoothing=None, isLinearRegression=None, a=None, b=None):
     fig, ax = plt.subplots()

@@ -1,4 +1,3 @@
-
 // Wyświetlenie menu poprzez kliknięcie toggleMenu
 function toggleMenu() {
     var menuOverlay = document.getElementById("menuOverlay");
