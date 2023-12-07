@@ -58,7 +58,6 @@ def explore_your_files():
 def explore_files():
     # Lista plików w folderze static/uploads
     files = os.listdir("static/uploads")
-
     return render_template("exploreFiles.html", files=files)
 
 @app.route("/explore_files/<file_name>")
@@ -130,7 +129,6 @@ def see_specific_file(file_name):
     data_linear_regression.loc[next_month_index, 'Wartosci'] = forecast_linear_regression
     chart_linear_regression = generate_chart(data_linear_regression, isLinearRegression=True, a=a, b=b)
 
-
     return render_template("specificFile.html", 
                            file_name=file_name, 
                            data=data.to_dict(orient='records'),
@@ -148,7 +146,6 @@ def see_specific_file(file_name):
                            chart_exponential_smoothing=chart_exponential_smoothing,
                            chart_linear_regression=chart_linear_regression
                            )
-
 
 @app.route('/delete_file/<file_name>', methods=['GET', 'POST'])
 def delete_file(file_name):
