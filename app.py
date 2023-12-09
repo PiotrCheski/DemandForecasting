@@ -1,19 +1,22 @@
+# Import bibliotek
 import os
 import pandas as pd
-from flask import Flask, render_template, redirect, url_for, request
-from werkzeug.utils import secure_filename
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import io, base64
+from flask import Flask, render_template, redirect, url_for, request
+from werkzeug.utils import secure_filename
+
+# Ustawienie trybu pracy biblioteki matplotlib
+matplotlib.use('Agg')
 
 app = Flask(__name__)
 
-# Funkcja opisująca główną stronę 
-@app.route("/", methods=["GET"])
+# Funkcja odpowiadająca za wyświetlenie strony głównej
+@app.route("/")
 def index():
-    return render_template("startingpage.html")
+    return render_template("startingPage.html")
 
 # Funkcja dotycząca przesyłu pliku .csv
 @app.route("/send_file", methods=["POST"])
@@ -28,38 +31,24 @@ def senf_file():
     else:
         return "No file"
 
-# Obsłużenie żądania przycisku open_how_we_work
-@app.route("/open_how_we_work", methods=["POST"])
-def open_how_we_work():
-    return redirect(url_for("howWeWork"))
-
-# Funkcja opisująca stronę hoWeWork
-@app.route("/how_we_work", methods=["GET"])
+# Funkcja odpowiadająca za wyświetlenie strony "Jak działamy"
+@app.route("/how_we_work")
 def howWeWork():
     return render_template("howWeWork.html")
 
-# Obsłużenie żądania przycisku open_how_we_work
-@app.route("/open_choose_file", methods=["POST"])
-def open_choose_file():
-    return redirect(url_for("chooseFile"))
-
-# Funkcja opisująca stronę hoWeWork
-@app.route("/choose_file", methods=["GET"])
+# Funkcja odpowiadająca za wyświetlenie strony "Prześlij swoje dane"
+@app.route("/choose_file")
 def chooseFile():
     return render_template("chooseFile.html")
 
-# Obsłużenie żądania przycisku open_how_we_work
-@app.route("/explore_your_files", methods=["POST"])
-def explore_your_files():
-    return redirect(url_for("explore_files"))
-
-# Funkcja opisująca stronę hoWeWork
-@app.route("/explore_files", methods=["GET", "POST"])
+# Funkcja odpowiadająca za wyświetlenie strony "Wyświetl swoje dane"
+@app.route("/explore_files")
 def explore_files():
     # Lista plików w folderze static/uploads
     files = os.listdir("static/uploads")
     return render_template("exploreFiles.html", files=files)
 
+# Funkcja odpowiadająca za wyświetlenie strony dla wybranego, wcześniej przesłanego pliku .csv
 @app.route("/explore_files/<file_name>")
 def see_specific_file(file_name):
 
@@ -69,18 +58,23 @@ def see_specific_file(file_name):
     # Wczytanie danych przez bilbiotekę pandas
     data = pd.read_csv(file_path)
 
-    # Obliczenie średniej
+    # Obliczenie średniej stałej
     average = calculate_avg(data)
 
+    # Obliczenie średniej ruchomej dla n = 3, n = 6 oraz n = 9
     moving_avg_n3 = calculate_moving_avg(data, 3)
     moving_avg_n6 = calculate_moving_avg(data, 6)
     moving_avg_n9 = calculate_moving_avg(data, 9)
 
-    smoothed_values_010 = calculate_exp_smoothing(data, 0.10)
-    smoothed_values_015 = calculate_exp_smoothing(data, 0.15)
-    smoothed_values_020 = calculate_exp_smoothing(data, 0.20)
+    # Obliczenie prognozy metodą wygładzenia wykładniczego dla α = 0.10, α = 0.15 oraz α = 0.20
+    initial_value = average
+    smoothed_values_010 = calculate_exp_smoothing(data, initial_value, 0.10)
+    smoothed_values_015 = calculate_exp_smoothing(data, initial_value, 0.15)
+    smoothed_values_020 = calculate_exp_smoothing(data, initial_value, 0.20)
 
+    # Określenie parametrów funkcji liniowej y=ax+b odpowiadającej lini trendu przy użyciu regresji liniowej
     a, b = params_linear_regression(data)
+    # Określenie prognozy z równania y=ax+b uzysakanego metodą regresji liniowej
     forecast_linear_regression = round(calculate_forecast_linear_regression(data, a, b))
 
     # Wykres dla oryginalnego zestawu danych
@@ -100,29 +94,24 @@ def see_specific_file(file_name):
     data_moving["n3"] = data_moving["Wartosci"]
     data_moving["n6"] = data_moving["Wartosci"]
     data_moving["n9"] = data_moving["Wartosci"]
-    
-    data_moving.loc[next_month_index, 'n3'] = moving_avg_n3[-1]
-    data_moving.loc[next_month_index, 'n6'] = moving_avg_n6[-1]
-    data_moving.loc[next_month_index, 'n9'] = moving_avg_n9[-1]
-
+    data_moving.loc[next_month_index, 'n3'] = moving_avg_n3
+    data_moving.loc[next_month_index, 'n6'] = moving_avg_n6
+    data_moving.loc[next_month_index, 'n9'] = moving_avg_n9
     chart_moving = generate_chart(data_moving, isAverageMoving=True)
 
     # Wykres dla prognozy metodą wygładzenia wykładniczego
     data_exponential_smoothing = data.copy()
     next_month_index = data_exponential_smoothing.index.max() + 1
     data_exponential_smoothing.loc[next_month_index, 'Okres'] = data_exponential_smoothing['Okres'].max() + 1
-
     data_exponential_smoothing["010"] = data_exponential_smoothing["Wartosci"]
     data_exponential_smoothing["015"] = data_exponential_smoothing["Wartosci"]
     data_exponential_smoothing["020"] = data_exponential_smoothing["Wartosci"]
-
-    data_exponential_smoothing.loc[next_month_index, "010"] = smoothed_values_010[-1]
-    data_exponential_smoothing.loc[next_month_index, "015"] = smoothed_values_015[-1]
-    data_exponential_smoothing.loc[next_month_index, "020"] = smoothed_values_020[-1]
-
+    data_exponential_smoothing.loc[next_month_index, "010"] = smoothed_values_010
+    data_exponential_smoothing.loc[next_month_index, "015"] = smoothed_values_015
+    data_exponential_smoothing.loc[next_month_index, "020"] = smoothed_values_020
     chart_exponential_smoothing = generate_chart(data_exponential_smoothing, isExponentialSmoothing=True)
 
-    # Wykres dla regresji liniowej
+    # Wykres dla prognozy metodą regresji liniowej
     data_linear_regression = data.copy()
     next_month_index = data_linear_regression.index.max() + 1
     data_linear_regression.loc[next_month_index, 'Okres'] = data_linear_regression['Okres'].max() + 1
@@ -147,37 +136,39 @@ def see_specific_file(file_name):
                            chart_linear_regression=chart_linear_regression
                            )
 
+# Funkcja dotycząca usunięcia pliku .csv
 @app.route('/delete_file/<file_name>', methods=['GET', 'POST'])
 def delete_file(file_name):
     file_path = 'static/uploads/' + file_name
     os.remove(file_path)
     return redirect(url_for("explore_files"))
 
-# Funkcja licząca średnią z zestawu danych dla kolumny "Wartosci"
+# Funkcja licząca średnią stałą
 def calculate_avg(data):
     return round(data["Wartosci"].mean())
 
+# Funkcja licząca średnią ruchomą
 def calculate_moving_avg(data, n):
     data = data["Wartosci"]
-    moving_averages = []
+    sum_of_n_values = 0
+    for value in data[-n:]:
+        sum_of_n_values += value
+    moving_average = round(sum_of_n_values / n)
+    return moving_average
 
-    for i in range(len(data) - n + 1):
-        window = data.iloc[i : i + n]
-        avg = round(window.mean())
-        moving_averages.append(avg)
-
-    return moving_averages
-
-def calculate_exp_smoothing(data, alfa):
+# Funkcja licząca prognozę metodą wygładzenia wykładniczego
+def calculate_exp_smoothing(data, initial_value, alfa):
     data = data["Wartosci"]
-    smoothed_values = [130]  # Initialize with the first value
+    smoothed_values = [initial_value] 
 
-    for i in range(1, len(data)):
-        smoothed_value = round(alfa * data[i] + (1 - alfa) * smoothed_values[-1])
+    for i in range(1, len(data)+1):
+        smoothed_value = round(alfa * data[i-1] + (1 - alfa) * smoothed_values[-1])
+        print(smoothed_value)
         smoothed_values.append(smoothed_value)
 
-    return smoothed_values
+    return smoothed_values[-1]
 
+# Funkcja określająca parametry funkcji liniowej y=ax+b odpowiadającej lini trendu przy użyciu regresji liniowej
 def params_linear_regression(data):
     n = len(data)
     sum_x = sum(data["Okres"])
@@ -189,19 +180,19 @@ def params_linear_regression(data):
     b = (sum_y/n) - (a*(sum_x)/n)
     return a, b
 
+# Funkcja określająca prognozę z równania y=ax+b uzysakanego metodą regresji liniowej
 def calculate_forecast_linear_regression(data, a, b):
     n = len(data)
     forecast_linear_regression = (n+1) * a + b
     return forecast_linear_regression
 
+#Funkcja odpowiadająca za wygenerowanie wykresów
 def generate_chart(data, isAverage=None, isAverageMoving=None, isExponentialSmoothing=None, isLinearRegression=None, a=None, b=None):
     fig, ax = plt.subplots()
     fig.set_size_inches(10, 6)
-    # Set the background color for the figure and axis
     fig.set_facecolor('#5c78a3')
     ax.set_facecolor('#5c78a3')
 
-    # Create a bar chart
     plt.plot(data['Okres'], data['Wartosci'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
     plt.scatter(data['Okres'], data['Wartosci'], color='white', s=50, zorder=10)
 
@@ -234,10 +225,8 @@ def generate_chart(data, isAverage=None, isAverageMoving=None, isExponentialSmoo
             y_values = [a * x + b for x in x_values]
             plt.plot(x_values, y_values, color="red", label="Linia trendu")
             
-
     plt.xlabel('Okres', fontsize=14)
     plt.ylabel('Wartość', fontsize=14)
-
     plt.xticks(data['Okres'])
     max_value = max(data['Wartosci'])
     y_ticks = np.arange(0, 1.1*max_value, 50)
@@ -247,9 +236,7 @@ def generate_chart(data, isAverage=None, isAverageMoving=None, isExponentialSmoo
     plt.savefig(obraz, format='png')
     obraz.seek(0)
     obraz64 = base64.b64encode(obraz.read()).decode()
-
     plt.close(fig)
-
     return obraz64
 
 if __name__ == "__main__":

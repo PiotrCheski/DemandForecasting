@@ -11,15 +11,12 @@
     </div>
 
     <div class="buttons-main-page">
-        <form action="/open_how_we_work" method="post">    
-            <button>JAK DZIAŁAMY</button>
-        </form>
 
-        <form action="/open_choose_file" method="post">    
-            <button>PRZEŚLIJ<br>SWOJE DANE</button>
-        </form>
-        <form action="/explore_your_files" method="post">    
-            <button>WYŚWIETL<br>SWOJE DANE</button>
-        </form>
+        <button><a href="{{ url_for('howWeWork') }}">JAK DZIAŁAMY</a></button>
+
+        <button><a href="{{ url_for('chooseFile') }}">PRZEŚLIJ SWOJE DANE</a></button>
+
+        <button><a href="{{ url_for('explore_files') }}">WYŚWIETL SWOJE DANE</a></button>
+
     </div>
 {% endblock %}

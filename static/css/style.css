@@ -11,16 +11,16 @@ body {
     cursor: pointer;
     padding-top: 20px;
     padding-right: 40px;
-    right: 10px; /* Adjust the right value as needed */
-    position: fixed; /* Use fixed positioning */
-    top: 10px; /* Adjust the top value as needed */
-    z-index: 1000; /* Ensure it's above other elements */
+    right: 10px;
+    position: fixed;
+    top: 10px;
+    z-index: 1000;
 }
 
 .bar {
     width: 40px;
     height: 5px;
-    background-color: #fff; /* Change to a color that contrasts with your background */
+    background-color: #fff;
     margin: 4px 0;
     transition: 0.4s;
 }
@@ -29,11 +29,11 @@ body {
     overflow: hidden;
     position: fixed;
     top: 0;
-    right: -500px; /* Start off-screen to the right */
+    right: -500px; 
     height: 100%;
-    width: 500px; /* Adjust the width as needed */
+    width: 500px; 
     background-color: #fff;
-    transition: right 0.4s ease; /* Transition the 'right' property */
+    transition: right 0.4s ease;
     z-index: 1001;
 }
 
@@ -58,8 +58,8 @@ body {
 }
 
 .show-menu {
-    right: 0; /* Move the menu to the visible part of the screen */
-} /* Add other styles for the open menu */
+    right: 0; 
+}
 
 
 h1 {
@@ -72,9 +72,9 @@ h1 {
 .quarter-circle {
     width: 150px;
     height: 150px;
-    background-color: #fff; /* You can change the color */
-    border-radius: 0 0 100% 0; /* This creates the left-bottom quadrant */
-    overflow: hidden; /* Hides the other quadrants */
+    background-color: #fff; 
+    border-radius: 0 0 100% 0; 
+    overflow: hidden;
     position: absolute;
     top: 0;
     left: 0;
@@ -82,7 +82,7 @@ h1 {
 .title-main-page {
     position: absolute;
     top: 50%;
-    left: 3%; /* Adjust the left value as needed */
+    left: 3%; 
     transform: translateY(-40%);
 }
 
@@ -97,17 +97,13 @@ h1 {
     z-index: 1;
 }
 
-.buttons-main-page form {
-    margin-bottom: 60px;
-}
-
 .buttons-main-page button {
+    margin-bottom: 60px;
     width: 250px;
     height: 60px;
     padding: 10px;
     background-color: #fff;
-    color: #000;
-    border: 2px solid #fff;
+     border: 2px solid #fff;
     border-radius: 40px;
     cursor: pointer;
     display: flex;
@@ -118,12 +114,14 @@ h1 {
     letter-spacing: 2px;
 }
 .buttons-main-page button span {
-    /* Optionally, you can use a <span> to apply styles to the text explicitly */
-    width: 100%; /* Ensure the span takes up the full width */
+    width: 100%; 
     text-align: center;
 }
 
-
+.buttons-main-page button a {
+    text-decoration: none;
+    color: #000;
+}
 
 .how-we-work {
     display: flex;
@@ -146,14 +144,13 @@ h1 {
     font-size: 25px;
 }
 
-
 .file-list {
     margin-top: 100px;
     list-style-type: none;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Three equal columns */
-    gap: 20px; /* Adjust the gap between items as needed */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
 
 .file-container {
@@ -167,11 +164,11 @@ h1 {
     padding-left: 10px;
     padding-right: 10px;
     height: 100px;
-    width: 200px; /* Set a fixed width for both elements */
-    background-color: #fff; /* White background */
+    width: 200px;
+    background-color: #fff;
     display: flex;
     align-items: center;
-    justify-content: center; /* Center text horizontally */
+    justify-content: center;
     font-weight: bold;
     font-size: 15px;
 }
@@ -182,21 +179,20 @@ h1 {
     padding-left: 10px;
     padding-right: 10px;
     height:20px;
-    width: 200px; /* Set a fixed width for both elements */
-    background-color: #f14444; /* White background */
+    width: 200px;
+    background-color: #f14444;
     display: flex;
     align-items: center;
-    justify-content: center; /* Center text horizontally */
+    justify-content: center;
     font-weight: bold;
     margin-bottom: 30px;
 
 
 }
-
 .file-link,
 .delete-link {
     text-decoration: none;
-    color: #000; /* Adjust the text color as needed */
+    color: #000;
     cursor: pointer;
 }
 
@@ -216,7 +212,7 @@ h1 {
 .send-file button {
     width: 500px;
     height: 60px;
-    margin-top: 15px; /* Adjust as needed */
+    margin-top: 15px;
     background-color: #fff;
     color: #000;
     border: 2px solid #fff;
@@ -235,7 +231,7 @@ input[type="file"] {
     background: #fff;
     display: flex;
     align-items: center;
-    width: 500px; /* Dostosuj szerokość prostokąta według potrzeb */
+    width: 500px;
     height: 60px;
 
 }
@@ -252,7 +248,6 @@ input[type="file"] {
 .file-input-info {
     margin-left: 10px;
 }
-
 
 .specific-file {
     margin-top: 100px;
@@ -271,19 +266,18 @@ input[type="file"] {
 }
 
 .details-table table {
-    /* Your existing table styles go here */
-    width: 52%; /* Adjust the width as needed */
-    margin: auto; /* Center the table horizontally */
+    width: 52%; 
+    margin: auto;
     border-collapse: collapse;
 }
 
 .details-table thead {
-    background-color: #f2f2f2; /* Example background color for the header */
+    background-color: #f2f2f2;
 }
 
 .details-table th, td {
-    border: 1px solid #ddd; /* Example border styling */
-    padding: 4px; /* Example padding */
+    border: 1px solid #ddd;
+    padding: 4px;
     text-align: center;
 }
 
@@ -291,8 +285,8 @@ input[type="file"] {
 .explore-files {
     display: flex;
     align-items: center;
-    justify-content: center; /* Center horizontally */
-    height: 100vh; /* You can adjust the height based on your layout */
+    justify-content: center;
+    height: 100vh;
 }
 
 .explore-files h1 {
