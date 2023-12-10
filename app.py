@@ -11,23 +11,51 @@ from werkzeug.utils import secure_filename
 # Ustawienie trybu pracy biblioteki matplotlib
 matplotlib.use('Agg')
 
+# Określenie folderu, do którego przesyłane będą pliki
+UPLOAD_FOLDER = 'static/uploads/'
+
+# Określenie jakie pliki (z jakim rozszerzeniem) mogą być przesyłane pliki
+ALLOWED_EXTENSIONS = {'csv'}
+
 app = Flask(__name__)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Funkcja odpowiadająca za wyświetlenie strony głównej
 @app.route("/")
 def index():
     return render_template("startingPage.html")
 
+
+def is_allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def is_valid_csv(file_path):
+    df = pd.read_csv(file_path)
+    num_columns = len(df.columns)
+    if num_columns != 2:
+        return False  
+    for column in df.columns:
+        num_values = len(df[column])
+        if num_values != 12:
+            return False 
+    return True
+
 # Funkcja dotycząca przesyłu pliku .csv
 @app.route("/send_file", methods=["POST"])
-def senf_file():
+def send_file():
     if 'file' in request.files:
         file = request.files['file']
-        print(file)
-        filename = secure_filename(file.filename)
-        print(filename)
-        file.save("static/uploads/"+filename)
-        return redirect(url_for("explore_files"))
+        if is_allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+            if is_valid_csv(file_path):
+                return redirect(url_for("explore_files"))
+            else:
+                return "Invalid structure of the file"
+        else:
+            return "Invalid file type"
     else:
         return "No file"
 
@@ -163,7 +191,6 @@ def calculate_exp_smoothing(data, initial_value, alfa):
 
     for i in range(1, len(data)+1):
         smoothed_value = round(alfa * data[i-1] + (1 - alfa) * smoothed_values[-1])
-        print(smoothed_value)
         smoothed_values.append(smoothed_value)
 
     return smoothed_values[-1]
