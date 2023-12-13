@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Wyświetl swoje dane</title>
+{% endblock %}
+
+{% block body %}
+
+
+<form action="/przeslij-dane" method="post">
+    <div class="choose-category-and-product">
+        <div class="column">
+            <label>Kategorie:</label>
+            {% for category in unique_categories %}
+                <label>
+                    <input type="checkbox" name="category" value="{{ category }}"> {{ category }} <br>
+                </label>
+            {% endfor %}
+        </div>
+        <div class="column">
+            <label>Produkty:</label>
+            {% for product in unique_products %}
+                <label>
+                    <input type="checkbox" name="product" value="{{ product }}" onchange="handleProductCheckboxChange(this)"> {{ product }} <br>
+                </label>
+            {% endfor %}
+        </div>
+        <div class="column">
+            <label>Początkowy miesiąc i rok:</label>
+            <select name="start_month">
+                {% for month in range(1, 13) %}
+                    <option value="{{ month }}">{{ month }}</option>
+                {% endfor %}
+            </select>
+            <select name="start_year">
+                {% for year in range(2022, 2030) %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+            <br>
+
+            <label>Końcowy miesiąc i rok:</label>
+            <select name="end_month">
+                {% for month in range(1, 13) %}
+                    <option value="{{ month }}">{{ month }}</option>
+                {% endfor %}
+            </select>
+            <select name="end_year">
+                {% for year in range(2022, 2030) %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+            <br>
+        </div>
+    </div>
+    <button type="submit">Wyślij</button>
+</form>
+
+<script>
+// Przekazanie danych z Pythona do JavaScript
+var categoryProductDict = {{ category_product_dict | tojson | safe }};
+
+// Funkcja do obsługi zaznaczania checkboxów
+function updateProducts() {
+    // Pobierz wszystkie zaznaczone kategorie
+    var selectedCategories = document.querySelectorAll('input[name="category"]:checked');
+
+    // Dla każdej zaznaczonej kategorii
+    selectedCategories.forEach(function (category) {
+        // Pobierz odpowiadające jej produkty
+        var products = categoryProductDict[category.value];
+
+        // Dla każdego produktu
+        products.forEach(function (product) {
+            // Znajdź checkbox związany z produktem i zaznacz go
+            var productCheckbox = document.querySelector('input[name="product"][value="' + product + '"]');
+            if (productCheckbox) {
+                productCheckbox.checked = true;
+            }
+        });
+    });
+}
+
+// Dodaj nasłuchiwanie zmian w checkboxach kategorii
+var categoryCheckboxes = document.querySelectorAll('input[name="category"]');
+categoryCheckboxes.forEach(function (checkbox) {
+    checkbox.addEventListener('change', updateProducts);
+});
+
+function handleProductCheckboxChange(checkbox) {
+        if (!checkbox.checked) {
+            console.log("hello");
+            // Get the product value from the checkbox
+            var productValue = checkbox.value;
+            var category;
+            for (var key in categoryProductDict) {
+                if (categoryProductDict[key].includes(productValue)) {
+                    category = key;
+                    break;
+                }
+            }
+            var categoryCheckbox = document.querySelector('input[name="category"][value="' + category + '"]');
+            if (categoryCheckbox) {
+                categoryCheckbox.checked = false;
+            }
+        }
+}
+
+
+</script>
+
+{% endblock %}

@@ -127,12 +127,12 @@ h1 {
     display: flex;
 }
 
-.column {
+.how-we-work .column {
     flex: 1;
     padding: 20px;
 }
 
-.column:nth-child(odd) {
+.how-we-work .column:nth-child(odd) {
     transform: translateY(50%);
     display: grid;
     align-items: center;
@@ -317,4 +317,23 @@ input[type="file"] {
 .prediction .expsmooth020 {
     background-color: #B15EFF;
     color: black;
+}
+
+.choose-categories-and-products .column {
+    flex: 1;
+    padding: 20px;
+}
+
+.choose-categories-and-products .column:nth-child(odd) {
+    color: #fff;
+    font-weight: bold;
+    text-align: justify;
+    font-size: 25px;
+}
+
+.choose-categories-and-products .column:nth-child(even) {
+    color: #fff;
+    font-weight: bold;
+    text-align: justify;
+    font-size: 25px;
 }

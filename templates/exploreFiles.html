@@ -11,7 +11,7 @@
         <li class="file-item">
             <div class="file-container">
                 <div class="file-rectangle">
-                    <a href="{{ url_for('see_specific_file', file_name=file) }}" class="file-link">{{ file }}</a>
+                    <a href="{{ url_for('see_specific_file_new', file_name=file) }}" class="file-link">{{ file }}</a>
                 </div>
                 <div class="delete-container">
                     <a href="{{ url_for('delete_file', file_name=file) }}" class="delete-link" onclick="return confirm('Czy na pewno chcesz usunąć plik {{file}}?')">Usuń</a>

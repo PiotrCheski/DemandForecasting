@@ -26,19 +26,18 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def index():
     return render_template("startingPage.html")
 
-
 def is_allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def is_valid_csv(file_path):
-    df = pd.read_csv(file_path)
-    num_columns = len(df.columns)
-    if num_columns != 2:
-        return False  
-    for column in df.columns:
-        num_values = len(df[column])
-        if num_values != 12:
-            return False 
+    #df = pd.read_csv(file_path)
+    #num_columns = len(df.columns)
+    #if num_columns != 2:
+    #    return False  
+    #for column in df.columns:
+    #    num_values = len(df[column])
+    #    if num_values != 12:
+    #        return False 
     return True
 
 # Funkcja dotycząca przesyłu pliku .csv
@@ -53,11 +52,11 @@ def send_file():
             if is_valid_csv(file_path):
                 return redirect(url_for("explore_files"))
             else:
-                return "Invalid structure of the file"
+                return "Niewłaściwa struktura pliku"
         else:
-            return "Invalid file type"
+            return "Niewłaściwe rozszerzenie pliku"
     else:
-        return "No file"
+        return "Brak pliku"
 
 # Funkcja odpowiadająca za wyświetlenie strony "Jak działamy"
 @app.route("/how_we_work")
@@ -77,6 +76,55 @@ def explore_files():
     return render_template("exploreFiles.html", files=files)
 
 # Funkcja odpowiadająca za wyświetlenie strony dla wybranego, wcześniej przesłanego pliku .csv
+@app.route("/explore_files_new/<file_name>")
+def see_specific_file_new(file_name):
+    # Określenie ścieżki do pliku
+    file_path = 'static/uploads/' + file_name
+
+    # Wczytanie danych przez bilbiotekę pandas
+    data = pd.read_csv(file_path)
+
+    unique_categories = data['Kategoria'].unique()
+    unique_products = data['Produkt'].unique()
+
+    # Grupowanie danych
+    unique_pairs = data.groupby(['Kategoria', 'Produkt']).size().reset_index(name='count')
+
+    # Tworzenie słownika
+    category_product_dict = {}
+    for row in unique_pairs.itertuples(index=False):
+        category = row[0]  # Kategoria
+        product = row[1]   # Produkt
+
+        if category not in category_product_dict:
+            category_product_dict[category] = []
+
+        category_product_dict[category].append(product)
+
+
+    print(category_product_dict)
+    return render_template("seeData.html", 
+                           file_name=file_name, 
+                           data=data.to_dict(orient='records'),
+                           unique_categories=unique_categories,
+                           unique_products=unique_products,
+                           category_product_dict=category_product_dict
+                           )
+
+@app.route('/przeslij-dane', methods=['POST'])
+def przeslij_dane():
+    selected_categories = request.form.getlist('category')
+    selected_products = request.form.getlist('product')
+    start_month = request.form.get('start_month')
+    start_year = request.form.get('start_year')
+
+    end_month = request.form.get('end_month')
+    end_year = request.form.get('end_year')
+
+    print(selected_categories, selected_products)
+    return "Dane zostały przesłane pomyślnie!"
+
+
 @app.route("/explore_files/<file_name>")
 def see_specific_file(file_name):
 

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Dane z pliku {{file_name}}</title>
+{% endblock %}
+
+{% block body %}
+
+<form action="/przeslij-dane" method="post">
+    <div class="choose-category-and-product">
+        <div class="column">
+            {% for category in unique_categories %}
+                <label>
+                    <input type="checkbox" name="category" value="{{ category }}"> {{ category }} <br>
+                </label>
+            {% endfor %}
+        </div>
+        <div class="column">
+            {% for product in unique_products %}
+                <label>
+                    <input type="checkbox" name="product" value="{{ product }}"> {{ product }} <br>
+                </label>
+            {% endfor %}
+        </div>
+    </div>
+    <button type="submit">Wyślij</button>
+</form>
+
+
+{% endblock %}
