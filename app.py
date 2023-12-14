@@ -145,6 +145,7 @@ def przeslij_dane():
     (data['Produkt'].isin(selected_products))
     ]
     sums_data = filtered_data.groupby(filtered_data['Data transakcji'].dt.to_period("M"))['Wartość'].sum().reset_index()
+    sums_data['Wartość'] = sums_data['Wartość'].round().astype(int)
     data = sums_data
     if forecast_decision == "forecast-no":
         chart_data = generate_chart_new(data)
