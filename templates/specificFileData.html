@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Dane z pliku {{file_name}}</title>
+{% endblock %}
+
+{% block body %}
+<div class="specific-file">
+    <h1 class="">Dane dotyczące sprzedaży z pliku {{file_name}}</h1>
+    <div class="details-table">
+        <table class="">
+            <thead>
+                <tr>
+                    <th>Rok-Miesiąc</th>
+                    <th>Wartość sprzedaży [zł/m-c]</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                    <tr>
+                        <td>{{ row['Data transakcji'] }}</td>
+                        <td>{{ row['Wartość'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <img src="data:image/png;base64, {{chart_data}}"> 
+    <h1>Prognoza popytu dla kolejnego miesiąca metodą średnich stałych</h1>
+    <div class="details-table">
+        <table class="">
+            <thead>
+                <tr>
+                    <th>Rok-Miesiąc</th>
+                    <th>Wartość sprzedaży [zł/m-c]</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                    <tr>
+                        <td>{{ row['Data transakcji'] }}</td>
+                        <td>{{ row['Wartość'] }}</td>
+                    </tr>
+                {% endfor %}
+                <tr class="prediction">
+                    <td>
+                        {{ forecast_month }}
+                    </td>
+                    <td>{{ average }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+
+
+

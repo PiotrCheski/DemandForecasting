@@ -8,6 +8,8 @@ import io, base64
 from flask import Flask, render_template, redirect, url_for, request
 from werkzeug.utils import secure_filename
 from flask_wtf.csrf import CSRFProtect
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 # Ustawienie trybu pracy biblioteki matplotlib
 matplotlib.use('Agg')
@@ -127,6 +129,7 @@ def przeslij_dane():
     start_year = int(request.form.get('start_year'))
     end_month = int(request.form.get('end_month'))
     end_year = int(request.form.get('end_year'))
+    forecast_decision= request.form['choice_forecast']
 
     # Określamy ścieżkę do pliku
     file_path = 'static/uploads/' + file_name
@@ -141,9 +144,60 @@ def przeslij_dane():
     (data['Data transakcji'] <= pd.Timestamp(end_year, end_month + 1, 1) - pd.Timedelta(days=1)) &
     (data['Produkt'].isin(selected_products))
     ]
-    print(filtered_data)
-    return "Dane zostały przesłane pomyślnie!"
+    sums_data = filtered_data.groupby(filtered_data['Data transakcji'].dt.to_period("M"))['Wartość'].sum().reset_index()
+    data = sums_data
+    if forecast_decision == "forecast-no":
+        chart_data = generate_chart_new(data)
+        average = calculate_avg(data)
+        return render_template("specificFileData.html",
+                                file_name=file_name,
+                                data=data.to_dict(orient='records'),
+                                chart_data=chart_data,
+                                average=average
+                            )
+    elif forecast_decision == "forecast-yes":
+        chart_data = generate_chart_new(data)
+        average = calculate_avg(data)
+        # Wybieramy ostatnią datę w filtered_data
+        last_date = filtered_data['Data transakcji'].max()
 
+        # Dodajemy jeden miesiąc do ostatniej daty
+        forecast_month = last_date + relativedelta(months=1)
+        forecast_month = forecast_month.to_period("M")
+
+        forecast_month = forecast_month.strftime('%Y-%m')
+        return render_template("specificFileData.html",
+                                file_name=file_name,
+                                data=data.to_dict(orient='records'),
+                                chart_data=chart_data,
+                                average=average,
+                                forecast_month=forecast_month
+                            )
+
+def generate_chart_new(data, isAverage=None, isAverageMoving=None, isExponentialSmoothing=None, isLinearRegression=None, a=None, b=None):
+    fig, ax = plt.subplots()
+    fig.set_size_inches(10, 6)
+    fig.set_facecolor('#5c78a3')
+    ax.set_facecolor('#5c78a3')
+    data['Data transakcji'] = data['Data transakcji'].astype(str)
+    plt.plot(data['Data transakcji'], data['Wartość'], marker='o', linestyle='-', color='b')
+    
+    # Dodanie etykiet i tytułu
+    plt.xlabel('Data transakcji')
+    plt.ylabel('Wartość')
+    plt.title('Suma wartości transakcji na przestrzeni miesięcy')
+    
+    # Formatowanie dat na osi x
+    plt.xticks(rotation=45, ha='right')
+    
+    # Wyświetlenie siatki
+    plt.grid(True)
+    obraz = io.BytesIO()
+    plt.savefig(obraz, format='png')
+    obraz.seek(0)
+    obraz64 = base64.b64encode(obraz.read()).decode()
+    plt.close(fig)
+    return obraz64
 
 @app.route("/explore_files/<file_name>")
 def see_specific_file(file_name):
@@ -241,7 +295,7 @@ def delete_file(file_name):
 
 # Funkcja licząca średnią stałą
 def calculate_avg(data):
-    return round(data["Wartosci"].mean())
+    return round(data["Wartość"].mean())
 
 # Funkcja licząca średnią ruchomą
 def calculate_moving_avg(data, n):
@@ -288,8 +342,8 @@ def generate_chart(data, isAverage=None, isAverageMoving=None, isExponentialSmoo
     fig.set_facecolor('#5c78a3')
     ax.set_facecolor('#5c78a3')
 
-    plt.plot(data['Okres'], data['Wartosci'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
-    plt.scatter(data['Okres'], data['Wartosci'], color='white', s=50, zorder=10)
+    plt.plot(data['Data transakcji'], data['Wartość'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
+    plt.scatter(data['Data transakcji'], data['Wartość'], color='white', s=50, zorder=10)
 
     if isAverage==True:
             plt.scatter(data['Okres'].iloc[-1], data['Wartosci'].iloc[-1], color='yellow', s=70, zorder=10)
@@ -320,10 +374,10 @@ def generate_chart(data, isAverage=None, isAverageMoving=None, isExponentialSmoo
             y_values = [a * x + b for x in x_values]
             plt.plot(x_values, y_values, color="red", label="Linia trendu")
             
-    plt.xlabel('Okres', fontsize=14)
+    plt.xlabel('Data transakcji', fontsize=14)
     plt.ylabel('Wartość', fontsize=14)
-    plt.xticks(data['Okres'])
-    max_value = max(data['Wartosci'])
+    plt.xticks(data['Data transakcji'])
+    max_value = max(data['Wartość'])
     y_ticks = np.arange(0, 1.1*max_value, 50)
     plt.yticks(y_ticks)
     plt.grid(True, linestyle='--', alpha=0.7, color='white')
