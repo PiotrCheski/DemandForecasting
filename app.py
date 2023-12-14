@@ -7,6 +7,7 @@ import numpy as np
 import io, base64
 from flask import Flask, render_template, redirect, url_for, request
 from werkzeug.utils import secure_filename
+from flask_wtf.csrf import CSRFProtect
 
 # Ustawienie trybu pracy biblioteki matplotlib
 matplotlib.use('Agg')
@@ -18,8 +19,10 @@ UPLOAD_FOLDER = 'static/uploads/'
 ALLOWED_EXTENSIONS = {'csv'}
 
 app = Flask(__name__)
+csrf = CSRFProtect(app)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['SECRET_KEY'] = 'tutaj_wpisz_dowolny_sekretny_klucz'
 
 # Funkcja odpowiadająca za wyświetlenie strony głównej
 @app.route("/")
@@ -101,27 +104,44 @@ def see_specific_file_new(file_name):
 
         category_product_dict[category].append(product)
 
+    data['Data transakcji'] = pd.to_datetime(data['Data transakcji'])
+    min_year = data['Data transakcji'].min().year
+    max_year = data['Data transakcji'].max().year
 
-    print(category_product_dict)
     return render_template("seeData.html", 
                            file_name=file_name, 
                            data=data.to_dict(orient='records'),
                            unique_categories=unique_categories,
                            unique_products=unique_products,
-                           category_product_dict=category_product_dict
+                           category_product_dict=category_product_dict,
+                           min_year=min_year,
+                           max_year=max_year,
                            )
 
 @app.route('/przeslij-dane', methods=['POST'])
 def przeslij_dane():
+    file_name = request.form['file_name']
     selected_categories = request.form.getlist('category')
     selected_products = request.form.getlist('product')
-    start_month = request.form.get('start_month')
-    start_year = request.form.get('start_year')
+    start_month = int(request.form.get('start_month'))
+    start_year = int(request.form.get('start_year'))
+    end_month = int(request.form.get('end_month'))
+    end_year = int(request.form.get('end_year'))
 
-    end_month = request.form.get('end_month')
-    end_year = request.form.get('end_year')
+    # Określamy ścieżkę do pliku
+    file_path = 'static/uploads/' + file_name
 
-    print(selected_categories, selected_products)
+    # Wczytujemy dane przez bibliotekę pandas
+    data = pd.read_csv(file_path)
+    # Wybieramy tylko wiersze, gdzie kolumna 'Produkt' zawiera wartości z listy selected_products
+    data['Data transakcji'] = pd.to_datetime(data['Data transakcji'])
+
+    filtered_data = data[
+    (data['Data transakcji'] >= pd.Timestamp(start_year, start_month, 1)) &
+    (data['Data transakcji'] <= pd.Timestamp(end_year, end_month + 1, 1) - pd.Timedelta(days=1)) &
+    (data['Produkt'].isin(selected_products))
+    ]
+    print(filtered_data)
     return "Dane zostały przesłane pomyślnie!"
 
 
