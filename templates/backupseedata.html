@@ -6,36 +6,55 @@
 
 {% block body %}
 
-<div class="flex-container">
-    <div class="rectangle">
-        <h3><label>Wybierz <br> kategorie</label><br></h3>
-        {% for category in unique_categories %}
-            <label>
-                <input type="checkbox" name="category" value="{{ category }}"> {{ category }} <br>
-            </label>
-        {% endfor %}
+
+<form action="/przeslij-dane" method="post">
+    <div class="choose-category-and-product">
+        <div class="column">
+            <label>Kategorie:</label><br>
+            {% for category in unique_categories %}
+                <label>
+                    <input type="checkbox" name="category" value="{{ category }}"> {{ category }} <br>
+                </label>
+            {% endfor %}
+        </div>
+        <div class="column">
+            <label>Produkty:</label><br>
+            {% for product in unique_products %}
+                <label>
+                    <input type="checkbox" name="product" value="{{ product }}" onchange="handleProductCheckboxChange(this)"> {{ product }} <br>
+                </label>
+            {% endfor %}
+        </div>
+        <div class="column">
+            <label>Początkowy miesiąc i rok:</label>
+            <select name="start_month">
+                {% for month in range(1, 13) %}
+                    <option value="{{ month }}">{{ month }}</option>
+                {% endfor %}
+            </select>
+            <select name="start_year">
+                {% for year in range(2022, 2030) %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+            <br>
+
+            <label>Końcowy miesiąc i rok:</label>
+            <select name="end_month">
+                {% for month in range(1, 13) %}
+                    <option value="{{ month }}">{{ month }}</option>
+                {% endfor %}
+            </select>
+            <select name="end_year">
+                {% for year in range(2022, 2030) %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+            <br>
+        </div>
     </div>
-    <div class="rectangle">
-        <h3><label>Wybierz <br> produkty</label><br></h3>
-        {% for product in unique_products %}
-            <label>
-                <input type="checkbox" name="product" value="{{ product }}" onchange="handleProductCheckboxChange(this)"> {{ product }} <br>
-            </label>
-        {% endfor %}
-    </div>
-    <div class="rectangle">
-        <h3><label>Wybierz <br> okres</label><br></h3>
-    </div>
-</div>
-
-
-
-
-
-
-
-
-
+    <button type="submit">Wyślij</button>
+</form>
 
 <script>
 // Przekazanie danych z Pythona do JavaScript

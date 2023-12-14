@@ -319,21 +319,18 @@ input[type="file"] {
     color: black;
 }
 
-.choose-categories-and-products .column {
-    flex: 1;
-    padding: 20px;
+.flex-container {
+    display: flex; /* Ustawienie kontenera na flexbox */
+    justify-content: center; /* Wyrównanie do środka poziomo */
+    margin-top: 50px;
+}
+.rectangle {
+  width: 200px; /* Szerokość prostokąta */
+  height: 300px; /* Wysokość prostokąta */
+  margin: 10px; /* Margines między prostokątami */
+  background-color: #fff; /* Kolor tła prostokąta */
 }
 
-.choose-categories-and-products .column:nth-child(odd) {
-    color: #fff;
-    font-weight: bold;
-    text-align: justify;
-    font-size: 25px;
-}
-
-.choose-categories-and-products .column:nth-child(even) {
-    color: #fff;
-    font-weight: bold;
-    text-align: justify;
-    font-size: 25px;
+.rectangle h3 {
+    text-align: center;
 }
