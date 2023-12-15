@@ -63,14 +63,32 @@
 </div>
 
 <div class="question">
-    <h3>Czy chcesz dokonać prognozy na kolejny miesiąc?</h3>
-    <label>
-        <input type="radio" name="choice_forecast" value="forecast-yes"> Tak
-      </label>
+    <h3>Jaką metodę chcesz dokonać prognozy popytu?</h3>
     <br>
     <label>
-        <input type="radio" name="choice_forecast" value="forecast-no"> Nie, chcę tylko wyświetlić dane
+        <input type="radio" name="choice_forecast" value="forecast-no"> Chcę tylko wyświetlić dane
     </label>
+    <br>
+    <label>
+        <input type="radio" name="choice_forecast" value="forecast-average"> Metodą średnich stałych
+    </label>
+    <br>
+    <label>
+        <input type="radio" name="choice_forecast" value="forecast-average-moving"> Metodą średnich ruchomych
+    </label>
+    <br>
+    <label>
+        <input type="radio" name="choice_forecast" value="forecast-exponential-smoothing"> Metodą wykładzenia wykładniczego
+    </label>
+    <br>
+    <label>
+        <input type="radio" name="choice_forecast" value="forecast-linear-regression"> Metodą regresji liniowej
+    </label>
+    <br>
+    <label>
+        <input type="radio" name="choice_forecast" value="forecast-all"> Chcę wyświetlić porównanie wyników wszystkich wymienionych wyżej metod
+    </label>
+
     <button id="submitButton" type="submit">Przejdź do analizy</button>
 </div>
 </form>

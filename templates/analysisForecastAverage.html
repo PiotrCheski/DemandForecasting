@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Dane z pliku {{file_name}}</title>
+{% endblock %}
+
+{% block body %}
+<div class="specific-file">
+    <h1 class="">Wybrane produkty:</h1>
+    <h1 class="">        
+        {% for product in selected_products %}
+        <li>{{ product }}</li>
+        {% endfor %}
+    </h1>
+    <h1 class="">Okres analizy:</h1>
+    <h1 class="">  
+        <li> Od {{ start_month }}/{{ start_year }}</li>
+        <li> Do {{ end_month }}/{{ end_year }}</li>
+    </h1>
+    <h3>Prognoza popytu dla kolejnego miesiąca metodą średnich stałych</h3>
+    <div class="details-table">
+        <table class="">
+            <thead>
+                <tr>
+                    <th>Rok-Miesiąc</th>
+                    <th>Łączna wartość transakcji [zł/m-c]</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                    <tr>
+                        <td>{{ row['Data transakcji'] }}</td>
+                        <td>{{ row['Wartość'] }}</td>
+                    </tr>
+                {% endfor %}
+                <tr class="prediction">
+                    <td>
+                        {{ forecast_month }}
+                    </td>
+                    <td>{{ average }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <img src="data:image/png;base64, {{chart_data}}"> 
+</div>
+{% endblock %}
+
+
+
+
+
+if len(data) >= 9:
+moving_avg_n3 = calculate_moving_avg(data, 3)
+moving_avg_n6 = calculate_moving_avg(data, 6)
+moving_avg_n9 = calculate_moving_avg(data, 9)
+elif len(data) >= 6:
+moving_avg_n3 = calculate_moving_avg(data, 3)
+moving_avg_n6 = calculate_moving_avg(data, 6)
+elif len(data) >= 3:
+moving_avg_n3 = calculate_moving_avg(data, 3)
+else:
+return 

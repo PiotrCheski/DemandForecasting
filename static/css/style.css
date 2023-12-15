@@ -258,6 +258,10 @@ input[type="file"] {
     font-size: 20px;
 }
 
+.specific-file li {
+    color: black;
+}
+
 .details-table {
     margin-top: 20px;
     display: flex;
@@ -344,13 +348,17 @@ input[type="file"] {
 }
 
 .question {
-    width: 650px;
+    width: 800px;
     display: flex;
     flex-direction: column;
-    margin: 0 auto; /* Add this line for centering */
+    margin-left: 320px;
     text-align: left; /* Align text inside the div to the left */
 }
 
+.question label {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
 
 .question button {
     width: 300px;
