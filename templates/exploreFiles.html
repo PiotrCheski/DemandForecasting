@@ -21,8 +21,9 @@
     {% endfor %}
 </ul>
 {% else %}
-<div class="explore-files">
+<div class="no-files">
 <h1>Brak danych</h1>
+<button id="submitButton"><a href="{{ url_for('chooseFile') }}">PRZEŚLIJ SWOJE DANE</a></button>
 </div>
 {% endif %}
 

@@ -133,7 +133,7 @@ h1 {
 }
 
 .how-we-work .column:nth-child(odd) {
-    transform: translateY(50%);
+    transform: translateY(25%);
     display: grid;
     align-items: center;
     justify-content: center;
@@ -144,6 +144,22 @@ h1 {
     font-size: 25px;
 }
 
+.how-we-work .column:nth-child(even) {
+    transform: translateY(25%);
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: #fff;
+    font-weight: bold;
+    text-align: justify;
+    font-size: 25px;
+}
+
+.how-we-work img {
+    max-width: 98%;
+    max-height: 95%;
+}
 .file-list {
     margin-top: 100px;
     list-style-type: none;
@@ -372,4 +388,32 @@ input[type="file"] {
     font-weight: bold;
     font-size: 15px;
     letter-spacing: 2px;
+}
+
+.no-files {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.no-files button {
+    width: 500px;
+    height: 60px;
+    margin-top: 15px;
+    background-color: #fff;
+    color: #000;
+    border: 2px solid #fff;
+    border-radius: 40px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+    letter-spacing: 2px;
+}
+
+.no-files a {
+    text-decoration: none;
+    color: black;
 }
