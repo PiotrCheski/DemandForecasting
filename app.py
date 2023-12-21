@@ -392,36 +392,47 @@ def generate_chart_new(data, isAverage=None, isAverageMoving=None, isExponential
         plt.title('Łączna wartość transakcji w danym miesięcu wraz z prognozą łącznej wartości transakcji w kolejnym miesiącu')
         
     if isAverageMoving==True:
+        
+        # Poniższe linijki mają jedynie na celu manipulacje biblioteką matplotlib w celu wyświetlenia trzech słupków obok siebie
+        # Stworzenie tymczasowego pliku z datami transakcjami
         data['Data transakcji TMP'] = pd.to_datetime(data['Data transakcji'])
 
-
+        # Określenie miesiąca po miesiącu prognozowanym 
         next_month = data['Data transakcji TMP'].iloc[-1] + pd.DateOffset(months=1)
         next_month = next_month.strftime('%Y-%m')
 
+        # Określenie miesiąca po miesiącu po miesiącu prognozowanym 
         next_next_month = data['Data transakcji TMP'].iloc[-1] + pd.DateOffset(months=2)
         next_next_month = next_next_month.strftime('%Y-%m')
 
-
-        # Plot the bars with slightly moved x positions
         ax.bar(data['Data transakcji'].iloc[-1], data['n3'].iloc[-1], color='yellow', zorder=53)
         ax.bar(next_month, data['n6'].iloc[-1], color='red', zorder=3)
         ax.bar(next_next_month, data['n9'].iloc[-1], color='#B15EFF', zorder=3)
 
     if isExponentialSmoothing==True:
-        plt.plot(data['Data transakcji'], data['010'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
-        plt.scatter(data['Data transakcji'].iloc[-1], data['010'].iloc[-1], color='yellow', s=70, zorder=10)
 
-        plt.plot(data['Data transakcji'], data['015'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
-        plt.scatter(data['Data transakcji'].iloc[-1], data['015'].iloc[-1], color='red', s=70, zorder=10)
+        # Poniższe linijki mają jedynie na celu manipulacje biblioteką matplotlib w celu wyświetlenia trzech słupków obok siebie
+        # Stworzenie tymczasowego pliku z datami transakcjami
+        data['Data transakcji TMP'] = pd.to_datetime(data['Data transakcji'])
 
-        plt.plot(data['Data transakcji'], data['020'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
-        plt.scatter(data['Data transakcji'].iloc[-1], data['020'].iloc[-1], color='#B15EFF', s=70, zorder=10) 
+        # Określenie miesiąca po miesiącu prognozowanym 
+        next_month = data['Data transakcji TMP'].iloc[-1] + pd.DateOffset(months=1)
+        next_month = next_month.strftime('%Y-%m')
+
+        # Określenie miesiąca po miesiącu po miesiącu prognozowanym 
+        next_next_month = data['Data transakcji TMP'].iloc[-1] + pd.DateOffset(months=2)
+        next_next_month = next_next_month.strftime('%Y-%m')
+
+        ax.bar(data['Data transakcji'].iloc[-1], data['010'].iloc[-1], color='yellow', zorder=53)
+        ax.bar(next_month, data['015'].iloc[-1], color='red', zorder=3)
+        ax.bar(next_next_month, data['020'].iloc[-1], color='#B15EFF', zorder=3)
+
 
     if isLinearRegression==True:
-            plt.scatter(data['Data transakcji'].iloc[-1], data['Wartość'].iloc[-1], color='yellow', s=70, zorder=10)
+            plt.bar(data['Data transakcji'].iloc[-1], data['Wartość'].iloc[-1], color='yellow', zorder=10)
             x_values = range(1, len(data))
             y_values = [a * x + b for x in x_values]
-            plt.plot(x_values, y_values, color="red", label="Linia trendu")
+            plt.plot(x_values, y_values, color="red", linewidth=4, label="Linia trendu")
     if len(data) >= 12:
         num_labels = 12
         # Calculate the step size to select the labels
