@@ -35,15 +35,15 @@ def is_allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def is_valid_csv(file_path):
-    #df = pd.read_csv(file_path)
-    #num_columns = len(df.columns)
-    #if num_columns != 2:
-    #    return False  
-    #for column in df.columns:
-    #    num_values = len(df[column])
-    #    if num_values != 12:
-    #        return False 
-    return True
+    df = pd.read_csv(file_path)
+    expected_columns = ['Data transakcji', 'Kategoria', 'Produkt', 'Liczba', 'Cena', 'Wartość']
+    
+    # Check if all expected columns are present
+    if set(expected_columns).issubset(df.columns):
+        return True
+    else:
+        missing_cols = list(set(expected_columns) - set(df.columns))
+        return missing_cols
 
 # Funkcja dotycząca przesyłu pliku .csv
 @app.route("/send_file", methods=["POST"])
@@ -54,10 +54,14 @@ def send_file():
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
-            if is_valid_csv(file_path):
+            validation_result = is_valid_csv(file_path)
+            if validation_result == True:
                 return redirect(url_for("explore_files"))
             else:
-                return "Niewłaściwa struktura pliku"
+                return render_template("errorMessage.html", 
+                           filename=filename,
+                           validation_result=validation_result
+                           )
         else:
             return "Niewłaściwe rozszerzenie pliku"
     else:
@@ -138,12 +142,20 @@ def przeslij_dane():
     data = pd.read_csv(file_path)
     # Wybieramy tylko wiersze, gdzie kolumna 'Produkt' zawiera wartości z listy selected_products
     data['Data transakcji'] = pd.to_datetime(data['Data transakcji'])
-
-    filtered_data = data[
-    (data['Data transakcji'] >= pd.Timestamp(start_year, start_month, 1)) &
-    (data['Data transakcji'] <= pd.Timestamp(end_year, end_month + 1, 1) - pd.Timedelta(days=1)) &
-    (data['Produkt'].isin(selected_products))
-    ]
+    if end_month == 12:
+        end_year += 1
+        end_month = 1
+        filtered_data = data[
+        (data['Data transakcji'] >= pd.Timestamp(start_year, start_month, 1)) &
+        (data['Data transakcji'] <= pd.Timestamp(end_year, end_month, 1) - pd.Timedelta(days=1)) &
+        (data['Produkt'].isin(selected_products))
+        ]
+    else:
+        filtered_data = data[
+        (data['Data transakcji'] >= pd.Timestamp(start_year, start_month, 1)) &
+        (data['Data transakcji'] <= pd.Timestamp(end_year, end_month + 1, 1) - pd.Timedelta(days=1)) &
+        (data['Produkt'].isin(selected_products))
+        ]
     sums_data = filtered_data.groupby(filtered_data['Data transakcji'].dt.to_period("M"))['Wartość'].sum().reset_index()
     sums_data['Wartość'] = sums_data['Wartość'].round().astype(int)
     data = sums_data

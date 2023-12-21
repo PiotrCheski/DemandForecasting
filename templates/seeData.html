@@ -88,15 +88,42 @@
     <label>
         <input type="radio" name="choice_forecast" value="forecast-all"> Chcę wyświetlić porównanie wyników wszystkich wymienionych wyżej metod
     </label>
-
-    <button id="submitButton" type="submit">Przejdź do analizy</button>
+    <button id="submitButton" type="submit" disabled>Przejdź do analizy</button>
 </div>
 </form>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var submitButton = document.getElementById("submitButton");
+
+        function handleProductCheckboxChange() {
+            var checkboxes = document.querySelectorAll('input[name="product"]');
+            var checkedCheckboxes = Array.from(checkboxes).filter(function (checkbox) {
+                return checkbox.checked;
+            });
+
+            var radioButtons = document.querySelectorAll('input[name="choice_forecast"]');
+            var checkedRadioButtons = Array.from(radioButtons).filter(function (radio) {
+                return radio.checked;
+            });
+
+            submitButton.disabled = checkedCheckboxes.length === 0 || checkedRadioButtons.length === 0;
+        }
+
+        var checkboxes = document.querySelectorAll('input[name="product"]');
+        checkboxes.forEach(function (checkbox) {
+            checkbox.addEventListener("change", handleProductCheckboxChange);
+        });
+
+        var radioButtons = document.querySelectorAll('input[name="choice_forecast"]');
+        radioButtons.forEach(function (radio) {
+            radio.addEventListener("change", handleProductCheckboxChange);
+        });
+});
+
+
 // Przekazanie danych z Pythona do JavaScript
 var categoryProductDict = {{ category_product_dict | tojson | safe }};
-
 // Funkcja do obsługi zaznaczania checkboxów
 function updateProducts() {
     // Pobierz wszystkie zaznaczone kategorie

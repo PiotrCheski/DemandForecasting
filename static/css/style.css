@@ -286,7 +286,7 @@ input[type="file"] {
 }
 
 .details-table table {
-    width: 52%; 
+    width: 60%; 
     margin: auto;
     border-collapse: collapse;
 }

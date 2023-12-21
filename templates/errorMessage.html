@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Błąd</title>
+{% endblock %}
+
+{% block body %}
+<div class="specific-file">
+    <h1>Niewłaściwy plik</h1>
+    {{ filename }}
+    <h1>Brakujące kolumny:</h1>
+    {% for missing_column in validation_result %}
+    <li>{{ missing_column }}</li>
+    {% endfor %}
+
+
+</div>
+{% endblock %}
