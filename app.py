@@ -8,40 +8,47 @@ import io, base64
 from flask import Flask, render_template, redirect, url_for, request
 from werkzeug.utils import secure_filename
 from flask_wtf.csrf import CSRFProtect
-from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+
+
+app = Flask(__name__)
+
+# Stworzenie zmiennej csrf wykorzystywanej do obrony przed atakami CSRF
+csrf = CSRFProtect(app)
 
 # Ustawienie trybu pracy biblioteki matplotlib
 matplotlib.use('Agg')
 
-# Określenie folderu, do którego przesyłane będą pliki
-UPLOAD_FOLDER = 'static/uploads/'
-
 # Określenie jakie pliki (z jakim rozszerzeniem) mogą być przesyłane pliki
 ALLOWED_EXTENSIONS = {'csv'}
 
-app = Flask(__name__)
-csrf = CSRFProtect(app)
+# Określenie folderu, do którego przesyłane będą pliki
+UPLOAD_FOLDER = 'static/uploads/'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['SECRET_KEY'] = 'tutaj_wpisz_dowolny_sekretny_klucz'
+
+# Sekret wykorzystywany podczas przesyłu formularzy w kontekście obrony przed atakami CSRF
+app.config['SECRET_KEY'] = 'aL7#Veiv@bCgm5fB@J8&@GxNS95T^XEPe9DANxt4Z9v*K$@^Fg7uCcH'
 
 # Funkcja odpowiadająca za wyświetlenie strony głównej
 @app.route("/")
 def index():
     return render_template("startingPage.html")
 
+# Funkcja odpowiedzialna za sprawdzenie czy przesyłany plik jest plikiem .csv
 def is_allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Funkcja odpowiedzialna za sprawdzenie czy przesyłany plik .csv ma właściwą strukturę
 def is_valid_csv(file_path):
     df = pd.read_csv(file_path)
     expected_columns = ['Data transakcji', 'Kategoria', 'Produkt', 'Liczba', 'Cena', 'Wartość']
     
-    # Check if all expected columns are present
+    # Sprawdzenie czy wszystkie spodziewane kolumny są w pliku CSV
     if set(expected_columns).issubset(df.columns):
         return True
     else:
+        # Określenie brakujących kolumn
         missing_cols = list(set(expected_columns) - set(df.columns))
         return missing_cols
 
@@ -50,13 +57,14 @@ def is_valid_csv(file_path):
 def send_file():
     if 'file' in request.files:
         file = request.files['file']
+        # Sprawdzenie czy przesyłany plik jest plikiem .csv
         if is_allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
             validation_result = is_valid_csv(file_path)
             if validation_result == True:
-                return redirect(url_for("explore_files"))
+                return redirect(url_for("exploreFiles"))
             else:
                 return render_template("errorMessage.html", 
                            filename=filename,
@@ -79,13 +87,13 @@ def chooseFile():
 
 # Funkcja odpowiadająca za wyświetlenie strony "Wyświetl swoje dane"
 @app.route("/explore_files")
-def explore_files():
+def exploreFiles():
     # Lista plików w folderze static/uploads
     files = os.listdir("static/uploads")
     return render_template("exploreFiles.html", files=files)
 
 # Funkcja odpowiadająca za wyświetlenie strony dla wybranego, wcześniej przesłanego pliku .csv
-@app.route("/explore_files_new/<file_name>")
+@app.route("/explore_file/<file_name>")
 def see_specific_file_new(file_name):
     # Określenie ścieżki do pliku
     file_path = 'static/uploads/' + file_name
@@ -93,25 +101,26 @@ def see_specific_file_new(file_name):
     # Wczytanie danych przez bilbiotekę pandas
     data = pd.read_csv(file_path)
 
+    # Określenie kategorii w pliku .csv
     unique_categories = data['Kategoria'].unique()
+    # Określenie produktów w pliku .csv
     unique_products = data['Produkt'].unique()
-
-    # Grupowanie danych
+    # Określenie relacji kategoria-produkt
     unique_pairs = data.groupby(['Kategoria', 'Produkt']).size().reset_index(name='count')
 
-    # Tworzenie słownika
+    # Stworzenie słownika zawierającego kategorie i odpowiadające im produkty
     category_product_dict = {}
     for row in unique_pairs.itertuples(index=False):
-        category = row[0]  # Kategoria
-        product = row[1]   # Produkt
-
+        category = row[0]
+        product = row[1]
         if category not in category_product_dict:
             category_product_dict[category] = []
-
         category_product_dict[category].append(product)
 
     data['Data transakcji'] = pd.to_datetime(data['Data transakcji'])
+    # Określenie najmniejszego roku
     min_year = data['Data transakcji'].min().year
+    # Określenie największego roku
     max_year = data['Data transakcji'].max().year
 
     return render_template("seeData.html", 
@@ -126,8 +135,8 @@ def see_specific_file_new(file_name):
 
 @app.route('/przeslij-dane', methods=['POST'])
 def przeslij_dane():
+    # Przechwycenie danych zaznaczonych w formularzu
     file_name = request.form['file_name']
-    selected_categories = request.form.getlist('category')
     selected_products = request.form.getlist('product')
     start_month = int(request.form.get('start_month'))
     start_year = int(request.form.get('start_year'))
@@ -135,7 +144,7 @@ def przeslij_dane():
     end_year = int(request.form.get('end_year'))
     forecast_decision= request.form['choice_forecast']
 
-    # Określamy ścieżkę do pliku
+    # Określenie ścieżki do pliku
     file_path = 'static/uploads/' + file_name
 
     # Wczytujemy dane przez bibliotekę pandas
@@ -145,23 +154,17 @@ def przeslij_dane():
     if end_month == 12:
         end_year += 1
         end_month = 1
-        filtered_data = data[
+
+    filtered_data = data[
         (data['Data transakcji'] >= pd.Timestamp(start_year, start_month, 1)) &
         (data['Data transakcji'] <= pd.Timestamp(end_year, end_month, 1) - pd.Timedelta(days=1)) &
         (data['Produkt'].isin(selected_products))
-        ]
-    else:
-        filtered_data = data[
-        (data['Data transakcji'] >= pd.Timestamp(start_year, start_month, 1)) &
-        (data['Data transakcji'] <= pd.Timestamp(end_year, end_month + 1, 1) - pd.Timedelta(days=1)) &
-        (data['Produkt'].isin(selected_products))
-        ]
+    ]
     sums_data = filtered_data.groupby(filtered_data['Data transakcji'].dt.to_period("M"))['Wartość'].sum().reset_index()
     sums_data['Wartość'] = sums_data['Wartość'].round().astype(int)
     data = sums_data
 
     if forecast_decision == "forecast-no":
-        average = calculate_avg(data)
         chart_data = generate_chart_new(data)
         return render_template("analysisForecastNo.html",
                                 file_name=file_name,
@@ -172,7 +175,6 @@ def przeslij_dane():
                                 end_month=end_month,
                                 end_year=end_year,
                                 chart_data=chart_data,
-                                average=average
                             )
     elif forecast_decision == "forecast-average":
          # Wybieramy ostatnią datę w filtered_data
@@ -379,25 +381,31 @@ def generate_chart_new(data, isAverage=None, isAverageMoving=None, isExponential
     ax.set_facecolor('#5c78a3')
 
     data['Data transakcji'] = data['Data transakcji'].astype(str)
-    plt.plot(data['Data transakcji'], data['Wartość'], marker='o', linestyle='-', color='b')
+    plt.bar(data['Data transakcji'], data['Wartość'], color='b', alpha=1.0, zorder=2)
 
     # Dodanie etykiet i tytułu
     plt.ylabel('Wartość transakcji [zł]')
     plt.title('Łączna wartość transakcji w danym miesięcu')
 
     if isAverage == True:
-        plt.scatter(data['Data transakcji'].iloc[-1], data['Wartość'].iloc[-1], color='yellow', s=70, zorder=10)
+        plt.bar(data['Data transakcji'].iloc[-1], data['Wartość'].iloc[-1], color='yellow', zorder=3)
         plt.title('Łączna wartość transakcji w danym miesięcu wraz z prognozą łącznej wartości transakcji w kolejnym miesiącu')
         
     if isAverageMoving==True:
-        plt.plot(data['Data transakcji'], data['n3'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
-        plt.scatter(data['Data transakcji'].iloc[-1], data['n3'].iloc[-1], color='yellow', s=70, zorder=10)
+        data['Data transakcji TMP'] = pd.to_datetime(data['Data transakcji'])
 
-        plt.plot(data['Data transakcji'], data['n6'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
-        plt.scatter(data['Data transakcji'].iloc[-1], data['n6'].iloc[-1], color='red', s=70, zorder=10)
 
-        plt.plot(data['Data transakcji'], data['n9'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
-        plt.scatter(data['Data transakcji'].iloc[-1], data['n9'].iloc[-1], color='#B15EFF', s=70, zorder=10)
+        next_month = data['Data transakcji TMP'].iloc[-1] + pd.DateOffset(months=1)
+        next_month = next_month.strftime('%Y-%m')
+
+        next_next_month = data['Data transakcji TMP'].iloc[-1] + pd.DateOffset(months=2)
+        next_next_month = next_next_month.strftime('%Y-%m')
+
+
+        # Plot the bars with slightly moved x positions
+        ax.bar(data['Data transakcji'].iloc[-1], data['n3'].iloc[-1], color='yellow', zorder=53)
+        ax.bar(next_month, data['n6'].iloc[-1], color='red', zorder=3)
+        ax.bar(next_next_month, data['n9'].iloc[-1], color='#B15EFF', zorder=3)
 
     if isExponentialSmoothing==True:
         plt.plot(data['Data transakcji'], data['010'], marker='o', linestyle='-', markersize=5, linewidth=2, color='black')
@@ -414,16 +422,16 @@ def generate_chart_new(data, isAverage=None, isAverageMoving=None, isExponential
             x_values = range(1, len(data))
             y_values = [a * x + b for x in x_values]
             plt.plot(x_values, y_values, color="red", label="Linia trendu")
-
-    num_labels = 12
-    # Calculate the step size to select the labels
-    step_size = len(data) // (num_labels - 1)
-    # Get the labels and include the last one
-    xticks = data['Data transakcji'].iloc[::step_size].tolist() + [data['Data transakcji'].iloc[-1]]
-    ax.set_xticks(xticks)
+    if len(data) >= 12:
+        num_labels = 12
+        # Calculate the step size to select the labels
+        step_size = len(data) // (num_labels - 1)
+        # Get the labels and include the last one
+        xticks = data['Data transakcji'].iloc[::step_size].tolist() + [data['Data transakcji'].iloc[-1]]
+        ax.set_xticks(xticks)
     # Rotate and align the tick labels
     plt.xticks(rotation=45, ha='right')
-    plt.grid(True)
+    plt.grid(True, zorder=1)
     obraz = io.BytesIO()
     plt.savefig(obraz, format='png')
     obraz.seek(0)
