@@ -11,12 +11,12 @@
     </div>
 
     <div class="buttons-main-page">
+        
+        <button onclick="window.location.href='{{ url_for('howWeWork') }}'">JAK DZIAŁAMY</button>
 
-        <button><a href="{{ url_for('howWeWork') }}">JAK DZIAŁAMY</a></button>
+        <button onclick="window.location.href='{{ url_for('chooseFile') }}'">PRZEŚLIJ SWOJE<br>DANE</button>
 
-        <button><a href="{{ url_for('chooseFile') }}">PRZEŚLIJ SWOJE DANE</a></button>
-
-        <button><a href="{{ url_for('exploreFiles') }}">WYŚWIETL SWOJE DANE</a></button>
+        <button onclick="window.location.href='{{ url_for('exploreFiles') }}'">WYŚWIETL SWOJE<br>DANE</button>
 
     </div>
 {% endblock %}

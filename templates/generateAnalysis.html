@@ -7,7 +7,7 @@
 {% block body %}
 
 
-<form action="/przeslij-dane" method="post">
+<form action="/generate_analysis" method="post">
 <input type="hidden" name="file_name" value="{{ file_name }}">
 <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
 <div class="flex-container">
@@ -31,34 +31,46 @@
             <h3><label>Wybierz <br> okres</label><br></h3>
     <div class="label-container">
       <label>Od: </label>
-      <select name="start_month">
-          {% for month in range(1, 13) %}
-              <option value="{{ month }}">{{ month }}</option>
-          {% endfor %}
-      </select>
-      /
-      <select name="start_year">
-          {% for year in range(min_year, max_year + 1) %}
-              <option value="{{ year }}">{{ year }}</option>
-          {% endfor %}
-      </select>
+        <div class="tooltip">
+            <span class="tooltiptext">Miesiąc początkowy</span>
+            <select name="start_month">
+                {% for month in range(1, 13) %}
+                    <option value="{{ month }}">{{ month }}</option>
+                {% endfor %}
+            </select>
+        </div> 
+        /
+        <div class="tooltip">
+            <span class="tooltiptext">Rok początkowy</span>
+            <select name="start_year">
+                {% for year in range(min_year, max_year + 1) %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div> 
     </div>
     <br>
-    <div class="label-container">
-    <br>
-      <label>Do: </label>
-      <select name="end_month">
-          {% for month in range(1, 13) %}
-              <option value="{{ month }}">{{ month }}</option>
-          {% endfor %}
-      </select>
-      /
-      <select name="end_year">
-          {% for year in range(min_year, max_year + 1) %}
-              <option value="{{ year }}">{{ year }}</option>
-          {% endfor %}
-      </select>
-    </div>
+        <div class="label-container">
+            <br>
+            <label>Do: </label>
+            <div class="tooltip">
+                <span class="tooltiptext-bottom">Miesiąc końcowy</span>
+                <select name="end_month">
+                    {% for month in range(1, 13) %}
+                        <option value="{{ month }}">{{ month }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        /
+            <div class="tooltip">
+                <span class="tooltiptext-bottom">Rok końcowy</span>
+                <select name="end_year">
+                    {% for year in range(min_year, max_year + 1) %}
+                        <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
     </div>
 </div>
 
