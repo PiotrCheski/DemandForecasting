@@ -40,10 +40,9 @@ def is_allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Funkcja odpowiedzialna za sprawdzenie czy przesyłany plik .csv ma właściwą strukturę
-def is_valid_csv(file_path):
+def is_valid_columns(file_path):
     df = pd.read_csv(file_path)
     expected_columns = ['Data transakcji', 'Kategoria', 'Produkt', 'Liczba', 'Cena', 'Wartość']
-    
     # Sprawdzenie czy wszystkie spodziewane kolumny są w pliku CSV
     if set(expected_columns).issubset(df.columns):
         return True
@@ -51,7 +50,25 @@ def is_valid_csv(file_path):
         # Określenie brakujących kolumn
         missing_cols = list(set(expected_columns) - set(df.columns))
         return missing_cols
+def is_valid_types(file_path):
+    df = pd.read_csv(file_path)
+    expected_columns = ['Data transakcji', 'Kategoria', 'Produkt', 'Liczba', 'Cena', 'Wartość']
+    expected_types = {
+        'Data transakcji': pd.Timestamp,
+        'Kategoria': object,
+        'Produkt': object,
+        'Liczba': "int64",
+        'Cena': "float64",
+        'Wartość': "float64"
+    }
 
+    for column in expected_columns:
+        if df[column].dtype != expected_types[column]:
+            print(f"Type mismatch in column {column}")
+            print("Expected type:", expected_types[column])
+            print("Actual type:", df[column].dtype)
+            return column
+    return True
 # Funkcja dotycząca przesyłu pliku .csv
 @app.route("/send_file", methods=["POST"])
 def send_file():
@@ -62,18 +79,31 @@ def send_file():
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
-            validation_result = is_valid_csv(file_path)
-            if validation_result == True:
-                return redirect(url_for("exploreFiles"))
+            validation_columns_result = is_valid_columns(file_path)
+            if validation_columns_result == True:
+                validation_types_result = is_valid_types(file_path)
+                if validation_types_result == True:
+                    return redirect(url_for("exploreFiles"))
+                else:
+                    return render_template("errorMessage.html", 
+                           filename=filename,
+                           validation_types_result=validation_types_result
+                        )
             else:
                 return render_template("errorMessage.html", 
                            filename=filename,
-                           validation_result=validation_result
-                           )
+                           validation_columns_result=validation_columns_result
+                        )
         else:
-            return "Niewłaściwe rozszerzenie pliku"
+            error_message = "Niewłaściwe rozszerzenie pliku. Oczekiwane rozszerzenie to .csv"
+            return render_template("errorMessage.html", 
+                           error_message=error_message
+                        )
     else:
-        return "Brak pliku"
+        error_message = "Brak pliku"
+        return render_template("errorMessage.html", 
+                           error_message=error_message
+                        )
 
 # Funkcja odpowiadająca za wyświetlenie strony "Jak działamy"
 @app.route("/how_we_work")
@@ -144,6 +174,16 @@ def przeslij_dane():
     end_year = int(request.form.get('end_year'))
     forecast_decision= request.form['choice_forecast']
 
+    if start_year > end_year:
+        error_message = "Niepoprawny zakres danych. Rok końcowy nie może być przed rokiem początkowym."
+        return render_template("errorMessage.html", 
+                           error_message=error_message
+                        )
+    if start_year == end_year and start_month > end_month:
+        error_message = "Niepoprawny zakres danych. Miesiąc końcowy nie może być przed miesiącem początkowym."
+        return render_template("errorMessage.html", 
+                           error_message=error_message
+                        )      
     # Określenie ścieżki do pliku
     file_path = 'static/uploads/' + file_name
 
@@ -151,19 +191,54 @@ def przeslij_dane():
     data = pd.read_csv(file_path)
     # Wybieramy tylko wiersze, gdzie kolumna 'Produkt' zawiera wartości z listy selected_products
     data['Data transakcji'] = pd.to_datetime(data['Data transakcji'])
-    if end_month == 12:
-        end_year += 1
-        end_month = 1
+    if start_month == end_month and start_month != 12:
+        filtered_data = data[
+            (data['Data transakcji'] >= pd.Timestamp(start_year, start_month, 1)) &
+            (data['Data transakcji'] <= pd.Timestamp(end_year, end_month+1, 1)) &
+            (data['Produkt'].isin(selected_products))
+        ]
+    elif start_month == end_month:
+        filtered_data = data[
+            (data['Data transakcji'] >= pd.Timestamp(start_year, start_month, 1)) &
+            (data['Data transakcji'] <= pd.Timestamp(end_year+1, 1, 1)) &
+            (data['Produkt'].isin(selected_products))
+        ]
+    elif end_month == 12:
+        filtered_data = data[
+            (data['Data transakcji'] >= pd.Timestamp(start_year, start_month, 1)) &
+            (data['Data transakcji'] <= pd.Timestamp(end_year+1, 1, 1)) &
+            (data['Produkt'].isin(selected_products))
+        ]
+    else:
+        filtered_data = data[
+            (data['Data transakcji'] >= pd.Timestamp(start_year, start_month, 1)) &
+            (data['Data transakcji'] <= pd.Timestamp(end_year, end_month+1, 1)) &
+            (data['Produkt'].isin(selected_products))
+        ]
+    full_date_range = pd.date_range(start=pd.Timestamp(start_year, start_month, 1),
+                                    end=pd.Timestamp(end_year, end_month, 1),
+                                    freq='MS').to_period("M")  
+    filtered_date_range = filtered_data['Data transakcji'].dt.to_period("M")
+    missing_periods = full_date_range.difference(filtered_date_range)
 
-    filtered_data = data[
-        (data['Data transakcji'] >= pd.Timestamp(start_year, start_month, 1)) &
-        (data['Data transakcji'] <= pd.Timestamp(end_year, end_month, 1) - pd.Timedelta(days=1)) &
-        (data['Produkt'].isin(selected_products))
-    ]
+
     sums_data = filtered_data.groupby(filtered_data['Data transakcji'].dt.to_period("M"))['Wartość'].sum().reset_index()
+    # Find missing periods
+    missing_periods = full_date_range.difference(filtered_date_range)
+
+    # Create a DataFrame with missing periods and value 0
+    missing_data = pd.DataFrame({'Data transakcji': missing_periods, 'Wartość': 0})
+
+    # Concatenate missing_data with sums_data and fill NaN with 0
+    sums_data = pd.concat([sums_data, missing_data]).sort_values('Data transakcji').fillna(0)
+
+    # Round and convert 'Wartość' to integer
     sums_data['Wartość'] = sums_data['Wartość'].round().astype(int)
     data = sums_data
 
+
+
+    
     if forecast_decision == "forecast-no":
         chart_data = generate_chart_new(data)
         return render_template("analysisForecastNo.html",
@@ -184,7 +259,6 @@ def przeslij_dane():
         forecast_month = last_date + relativedelta(months=1)
         forecast_month = forecast_month.to_period("M")
         forecast_month = forecast_month.strftime('%Y-%m')
-
         average = calculate_avg(data)
 
         data_average = data.copy()
@@ -213,28 +287,41 @@ def przeslij_dane():
         forecast_month = last_date + relativedelta(months=1)
         forecast_month = forecast_month.to_period("M")
         forecast_month = forecast_month.strftime('%Y-%m')
-
-        if len(data) >= 9:
-            moving_avg_n3 = calculate_moving_avg(data, 3)
-            moving_avg_n6 = calculate_moving_avg(data, 6)
-            moving_avg_n9 = calculate_moving_avg(data, 9)
-        elif len(data) >= 6:
-            moving_avg_n3 = calculate_moving_avg(data, 3)
-            moving_avg_n6 = calculate_moving_avg(data, 6)
-        elif len(data) >= 3:
-            moving_avg_n3 = calculate_moving_avg(data, 3)
-        else:
-            return "Zaznacz większy okres danych"
-
         data_moving = data.copy()
         next_month_index = data_moving.index.max() + 1
         data_moving.loc[next_month_index, 'Data transakcji'] = data_moving['Data transakcji'].max() + 1
         data_moving["n3"] = data_moving["Wartość"]
         data_moving["n6"] = data_moving["Wartość"]
         data_moving["n9"] = data_moving["Wartość"]
-        data_moving.loc[next_month_index, 'n3'] = moving_avg_n3
-        data_moving.loc[next_month_index, 'n6'] = moving_avg_n6
-        data_moving.loc[next_month_index, 'n9'] = moving_avg_n9
+
+        moving_avgs_dict = {}
+
+
+        if len(data) >= 9:
+            moving_avg_n3 = calculate_moving_avg(data, 3)
+            moving_avg_n6 = calculate_moving_avg(data, 6)
+            moving_avg_n9 = calculate_moving_avg(data, 9)
+            moving_avgs_dict['n3'] = moving_avg_n3
+            moving_avgs_dict['n6'] = moving_avg_n6
+            moving_avgs_dict['n9'] = moving_avg_n9
+            data_moving.loc[next_month_index, 'n3'] = moving_avg_n3
+            data_moving.loc[next_month_index, 'n6'] = moving_avg_n6
+            data_moving.loc[next_month_index, 'n9'] = moving_avg_n9
+        elif len(data) >= 6:
+            moving_avg_n3 = calculate_moving_avg(data, 3)
+            moving_avg_n6 = calculate_moving_avg(data, 6)
+            moving_avgs_dict['n3'] = moving_avg_n3
+            moving_avgs_dict['n6'] = moving_avg_n6
+            data_moving.loc[next_month_index, 'n3'] = moving_avg_n3
+            data_moving.loc[next_month_index, 'n6'] = moving_avg_n6
+        elif len(data) >= 3:
+            moving_avg_n3 = calculate_moving_avg(data, 3)
+            moving_avgs_dict['n3'] = moving_avg_n3
+            data_moving.loc[next_month_index, 'n3'] = moving_avg_n3
+        else:
+            return "Zaznacz większy okres danych"
+
+
         chart_data = generate_chart_new(data_moving, isAverageMoving=True)
 
         return render_template("analysisForecastAverageMoving.html",
@@ -245,11 +332,9 @@ def przeslij_dane():
                                 start_year=start_year,
                                 end_month=end_month,
                                 end_year=end_year,
-                                moving_avg_n3=moving_avg_n3,
-                                moving_avg_n6=moving_avg_n6,
-                                moving_avg_n9=moving_avg_n9,
+                                moving_avgs_dict=moving_avgs_dict,
                                 forecast_month=forecast_month,
-                                chart_data=chart_data,
+                                chart_data=chart_data
         )
 
     elif forecast_decision == "forecast-exponential-smoothing":
@@ -336,24 +421,37 @@ def przeslij_dane():
         forecast_month = forecast_month.to_period("M")
         forecast_month = forecast_month.strftime('%Y-%m')
         average = calculate_avg(data)
+        moving_avgs_dict = {}
         if len(data) >= 9:
             moving_avg_n3 = calculate_moving_avg(data, 3)
             moving_avg_n6 = calculate_moving_avg(data, 6)
             moving_avg_n9 = calculate_moving_avg(data, 9)
+            moving_avgs_dict['n3'] = moving_avg_n3
+            moving_avgs_dict['n6'] = moving_avg_n6
+            moving_avgs_dict['n9'] = moving_avg_n9
+
         elif len(data) >= 6:
             moving_avg_n3 = calculate_moving_avg(data, 3)
             moving_avg_n6 = calculate_moving_avg(data, 6)
+            moving_avgs_dict['n3'] = moving_avg_n3
+            moving_avgs_dict['n6'] = moving_avg_n6
+            moving_avgs_dict['n9'] = "-" 
         elif len(data) >= 3:
             moving_avg_n3 = calculate_moving_avg(data, 3)
+            moving_avgs_dict['n6'] = "-"
+            moving_avgs_dict['n9'] = "-" 
         else:
-            moving_avg_n3 = 0
-            moving_avg_n6 = 0
-            moving_avg_n9 = 0
+            moving_avgs_dict['n3'] = "-"
+            moving_avgs_dict['n6'] = "-"
+            moving_avgs_dict['n9'] = "-" 
+    
         initial_value = average
         smoothed_values_010 = calculate_exp_smoothing(data, initial_value, 0.10)
         smoothed_values_015 = calculate_exp_smoothing(data, initial_value, 0.15)
         smoothed_values_020 = calculate_exp_smoothing(data, initial_value, 0.20)
+
         a, b = params_linear_regression(data)
+
         # Określenie prognozy z równania y=ax+b uzysakanego metodą regresji liniowej
         forecast_linear_regression = round(calculate_forecast_linear_regression(data, a, b))
         return render_template("analysisForecastAll.html",
@@ -366,9 +464,7 @@ def przeslij_dane():
                                 end_year=end_year,
                                 forecast_month=forecast_month,
                                 average=average,
-                                moving_avg_n3=moving_avg_n3,
-                                moving_avg_n6=moving_avg_n6,
-                                moving_avg_n9=moving_avg_n9,
+                                moving_avgs_dict=moving_avgs_dict,
                                 smoothed_values_010=smoothed_values_010,
                                 smoothed_values_015=smoothed_values_015,
                                 smoothed_values_020=smoothed_values_020,
@@ -381,16 +477,16 @@ def generate_chart_new(data, isAverage=None, isAverageMoving=None, isExponential
     ax.set_facecolor('#5c78a3')
 
     data['Data transakcji'] = data['Data transakcji'].astype(str)
-    plt.bar(data['Data transakcji'], data['Wartość'], color='b', alpha=1.0, zorder=2)
+    plt.bar(data['Data transakcji'], data['Wartość'], color='blue', alpha=1.0, zorder=2)
 
     # Dodanie etykiet i tytułu
-    plt.ylabel('Wartość transakcji [zł]')
-    plt.title('Łączna wartość transakcji w danym miesięcu')
+    plt.ylabel('Wartość transakcji [zł]', color="white", fontsize=15)
+    plt.title('Łączna wartość transakcji w danym miesięcu', color="white", fontsize=15)
 
     if isAverage == True:
-        plt.bar(data['Data transakcji'].iloc[-1], data['Wartość'].iloc[-1], color='yellow', zorder=3)
+        plt.bar(data['Data transakcji'].iloc[-1], data['Wartość'].iloc[-1], color='yellow', zorder=3, label="Prognoza")
         plt.title('Łączna wartość transakcji w danym miesięcu wraz z prognozą łącznej wartości transakcji w kolejnym miesiącu')
-        
+        plt.legend()
     if isAverageMoving==True:
         
         # Poniższe linijki mają jedynie na celu manipulacje biblioteką matplotlib w celu wyświetlenia trzech słupków obok siebie
@@ -405,10 +501,10 @@ def generate_chart_new(data, isAverage=None, isAverageMoving=None, isExponential
         next_next_month = data['Data transakcji TMP'].iloc[-1] + pd.DateOffset(months=2)
         next_next_month = next_next_month.strftime('%Y-%m')
 
-        ax.bar(data['Data transakcji'].iloc[-1], data['n3'].iloc[-1], color='yellow', zorder=53)
-        ax.bar(next_month, data['n6'].iloc[-1], color='red', zorder=3)
-        ax.bar(next_next_month, data['n9'].iloc[-1], color='#B15EFF', zorder=3)
-
+        ax.bar(data['Data transakcji'].iloc[-1], data['n3'].iloc[-1], color='yellow', zorder=53, label='n3')
+        ax.bar(next_month, data['n6'].iloc[-1], color='red', zorder=3, label='n6')
+        ax.bar(next_next_month, data['n9'].iloc[-1], color='#B15EFF', zorder=3, label='n9')
+        ax.legend()
     if isExponentialSmoothing==True:
 
         # Poniższe linijki mają jedynie na celu manipulacje biblioteką matplotlib w celu wyświetlenia trzech słupków obok siebie
@@ -423,16 +519,20 @@ def generate_chart_new(data, isAverage=None, isAverageMoving=None, isExponential
         next_next_month = data['Data transakcji TMP'].iloc[-1] + pd.DateOffset(months=2)
         next_next_month = next_next_month.strftime('%Y-%m')
 
-        ax.bar(data['Data transakcji'].iloc[-1], data['010'].iloc[-1], color='yellow', zorder=53)
-        ax.bar(next_month, data['015'].iloc[-1], color='red', zorder=3)
-        ax.bar(next_next_month, data['020'].iloc[-1], color='#B15EFF', zorder=3)
-
+        ax.bar(data['Data transakcji'].iloc[-1], data['010'].iloc[-1], color='yellow', zorder=53, label="α = 0,10")
+        ax.bar(next_month, data['015'].iloc[-1], color='red', zorder=3, label="α = 0,15")
+        ax.bar(next_next_month, data['020'].iloc[-1], color='#B15EFF', zorder=3, label="α = 0,20")
+        ax.legend()
 
     if isLinearRegression==True:
-            plt.bar(data['Data transakcji'].iloc[-1], data['Wartość'].iloc[-1], color='yellow', zorder=10)
-            x_values = range(1, len(data))
+            if data['Wartość'].iloc[-1] == 0:
+                plt.scatter(data['Data transakcji'].iloc[-1], data['Wartość'].iloc[-1], color='yellow', zorder=10)
+            else:
+                plt.bar(data['Data transakcji'].iloc[-1], data['Wartość'].iloc[-1], color='yellow', zorder=10)
+            x_values = range(0, len(data))
             y_values = [a * x + b for x in x_values]
             plt.plot(x_values, y_values, color="red", linewidth=4, label="Linia trendu")
+            ax.legend()
     if len(data) >= 12:
         num_labels = 12
         # Calculate the step size to select the labels
@@ -441,7 +541,8 @@ def generate_chart_new(data, isAverage=None, isAverageMoving=None, isExponential
         xticks = data['Data transakcji'].iloc[::step_size].tolist() + [data['Data transakcji'].iloc[-1]]
         ax.set_xticks(xticks)
     # Rotate and align the tick labels
-    plt.xticks(rotation=45, ha='right')
+    plt.yticks(color="white")
+    plt.xticks(rotation=45, ha='right', color="white", fontsize=11)
     plt.grid(True, zorder=1)
     obraz = io.BytesIO()
     plt.savefig(obraz, format='png')
@@ -455,7 +556,7 @@ def generate_chart_new(data, isAverage=None, isAverageMoving=None, isExponential
 def delete_file(file_name):
     file_path = 'static/uploads/' + file_name
     os.remove(file_path)
-    return redirect(url_for("explore_files"))
+    return redirect(url_for("exploreFiles"))
 
 # Funkcja licząca średnią stałą
 def calculate_avg(data):
@@ -490,14 +591,18 @@ def params_linear_regression(data):
     sum_x2 = sum(data["Index"]**2)
     sum_xy = sum(data["Index"]*data["Wartość"])
     
-    a = (n * sum_xy - sum_x*sum_y) / (n * sum_x2 - sum_x**2)
-    b = (sum_y/n) - (a*(sum_x)/n)
+    a = (n * sum_xy - sum_x * sum_y) / (n * sum_x2 - sum_x**2)
+    b = (sum_y - a * sum_x) / n
+
     return a, b
 
 # Funkcja określająca prognozę z równania y=ax+b uzysakanego metodą regresji liniowej
 def calculate_forecast_linear_regression(data, a, b):
-    n = len(data)
-    forecast_linear_regression = (n+1) * a + b
+    n = len(data)+2
+    forecast_linear_regression = n * a + b
+
+    # Sytuacja, gdy prognoza jest ujemna, wtedy wartość zamieniana jest na 0
+    forecast_linear_regression = max(forecast_linear_regression, 0)
     return forecast_linear_regression
 
 if __name__ == "__main__":

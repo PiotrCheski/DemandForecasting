@@ -6,13 +6,19 @@
 
 {% block body %}
 <div class="specific-file">
-    <h1>Niewłaściwy plik</h1>
-    {{ filename }}
-    <h1>Brakujące kolumny:</h1>
-    {% for missing_column in validation_result %}
-    <li>{{ missing_column }}</li>
-    {% endfor %}
-
-
+    {% if validation_columns_result %}
+        <h1>Przesłany plik: </h1>
+        {{ filename }}
+        <h1>Brakujące kolumny:</h1>
+        {% for missing_column in validation_columns_result %}
+            <li>{{ missing_column }}</li>
+        {% endfor %}
+    {% elif validation_types_result  %}
+        <h1>Przesłany plik: </h1>
+        {{ filename }}
+        <h1>Niewłaściwy typ danych w kolumnie: {{ validation_types_result }}</h1>
+    {% else %}
+        <h1>{{ error_message }}</h1>
+    {% endif %}
 </div>
 {% endblock %}
