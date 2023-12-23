@@ -7,7 +7,6 @@
 {% block body %}
 <div class="send-file">
     <form action="/send_file" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
         <div class="file-input-container">
             <label for="file-upload" class="custom-file-upload">
                 Wybierz plik

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-    <title>Wyświetl swoje dane</title>
+    <title>Określ zakres analizy</title>
 {% endblock %}
 
 {% block body %}
@@ -9,7 +9,6 @@
 
 <form action="/generate_analysis" method="post">
 <input type="hidden" name="file_name" value="{{ file_name }}">
-<input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />
 <div class="flex-container">
     <div class="rectangle">
         <h3><label>Wybierz <br> kategorie</label><br></h3>
@@ -23,7 +22,7 @@
         <h3><label>Wybierz <br> produkty</label><br></h3>
         {% for product in unique_products %}
             <label>
-                <input type="checkbox" name="product" value="{{ product }}" onchange="handleProductCheckboxChange(this)"> {{ product }} <br>
+                <input type="checkbox" name="product" value="{{ product }}" onchange="uncheckCategory(this)"> {{ product }} <br>
             </label>
         {% endfor %}
     </div>
@@ -103,84 +102,10 @@
     <button id="submitButton" type="submit" disabled>Przejdź do analizy</button>
 </div>
 </form>
-
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var submitButton = document.getElementById("submitButton");
-
-        function handleProductCheckboxChange() {
-            var checkboxes = document.querySelectorAll('input[name="product"]');
-            var checkedCheckboxes = Array.from(checkboxes).filter(function (checkbox) {
-                return checkbox.checked;
-            });
-
-            var radioButtons = document.querySelectorAll('input[name="choice_forecast"]');
-            var checkedRadioButtons = Array.from(radioButtons).filter(function (radio) {
-                return radio.checked;
-            });
-
-            submitButton.disabled = checkedCheckboxes.length === 0 || checkedRadioButtons.length === 0;
-        }
-
-        var checkboxes = document.querySelectorAll('input[name="product"]');
-        checkboxes.forEach(function (checkbox) {
-            checkbox.addEventListener("change", handleProductCheckboxChange);
-        });
-
-        var radioButtons = document.querySelectorAll('input[name="choice_forecast"]');
-        radioButtons.forEach(function (radio) {
-            radio.addEventListener("change", handleProductCheckboxChange);
-        });
-});
-
-
-// Przekazanie danych z Pythona do JavaScript
-var categoryProductDict = {{ category_product_dict | tojson | safe }};
-// Funkcja do obsługi zaznaczania checkboxów
-function updateProducts() {
-    // Pobierz wszystkie zaznaczone kategorie
-    var selectedCategories = document.querySelectorAll('input[name="category"]:checked');
-
-    // Dla każdej zaznaczonej kategorii
-    selectedCategories.forEach(function (category) {
-        // Pobierz odpowiadające jej produkty
-        var products = categoryProductDict[category.value];
-
-        // Dla każdego produktu
-        products.forEach(function (product) {
-            // Znajdź checkbox związany z produktem i zaznacz go
-            var productCheckbox = document.querySelector('input[name="product"][value="' + product + '"]');
-            if (productCheckbox) {
-                productCheckbox.checked = true;
-            }
-        });
-    });
-}
-
-// Dodaj nasłuchiwanie zmian w checkboxach kategorii
-var categoryCheckboxes = document.querySelectorAll('input[name="category"]');
-categoryCheckboxes.forEach(function (checkbox) {
-    checkbox.addEventListener('change', updateProducts);
-});
-
-function handleProductCheckboxChange(checkbox) {
-        if (!checkbox.checked) {
-            console.log("hello");
-            // Get the product value from the checkbox
-            var productValue = checkbox.value;
-            var category;
-            for (var key in categoryProductDict) {
-                if (categoryProductDict[key].includes(productValue)) {
-                    category = key;
-                    break;
-                }
-            }
-            var categoryCheckbox = document.querySelector('input[name="category"][value="' + category + '"]');
-            if (categoryCheckbox) {
-                categoryCheckbox.checked = false;
-            }
-        }
-}
-</script>
+    var categoryProductDict = {{ category_product_dict | tojson | safe }};
+ </script>
+<script src="{{url_for('static', filename='scripts/checkBoxes.js')}}"></script>
+<script src="{{url_for('static', filename='scripts/submitButton.js')}}"></script>
 
 {% endblock %}

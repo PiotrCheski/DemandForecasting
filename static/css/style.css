@@ -339,15 +339,15 @@ input[type="file"] {
 }
 
 .flex-container {
-    display: flex; /* Ustawienie kontenera na flexbox */
-    justify-content: center; /* Wyrównanie do środka poziomo */
+    display: flex;
+    justify-content: center;
     margin-top: 50px;
 }
 .rectangle {
-  width: 200px; /* Szerokość prostokąta */
-  height: 300px; /* Wysokość prostokąta */
-  margin: 10px; /* Margines między prostokątami */
-  background-color: #fff; /* Kolor tła prostokąta */
+  width: 200px;
+  height: 300px;
+  margin: 10px;
+  background-color: #fff;
 }
 
 .rectangle h3 {
@@ -367,7 +367,7 @@ input[type="file"] {
     display: flex;
     flex-direction: column;
     margin-left: 320px;
-    text-align: left; /* Align text inside the div to the left */
+    text-align: left;
 }
 
 .question label {
@@ -417,14 +417,12 @@ input[type="file"] {
     color: black;
 }
 
- /* Tooltip container */
 .tooltip {
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+  border-bottom: 1px dotted black;
 }
 
-/* Tooltip text */
 .tooltip .tooltiptext {
   visibility: hidden;
   width: 120px;
@@ -434,25 +432,21 @@ input[type="file"] {
   padding: 5px 0;
   border-radius: 6px;
 
-  /* Position the tooltip text */
   position: absolute;
   z-index: 1;
   bottom: 125%;
   left: 50%;
   margin-left: -60px;
 
-  /* Fade in tooltip */
   opacity: 0;
   transition: opacity 0.3s;
 }
 
-/* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltiptext {
   visibility: visible;
   opacity: 1;
 } 
 
-/* Tooltip text */
 .tooltip .tooltiptext-bottom {
   visibility: hidden;
   width: 120px;
@@ -462,19 +456,16 @@ input[type="file"] {
   padding: 5px 0;
   border-radius: 6px;
 
-  /* Position the tooltip text */
   position: absolute;
   z-index: 1;
   top: 125%;
   left: 50%;
   margin-left: -60px;
 
-  /* Fade in tooltip */
   opacity: 0;
   transition: opacity 0.3s;
 }
 
-/* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltiptext-bottom {
   visibility: visible;
   opacity: 1;
