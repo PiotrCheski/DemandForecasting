@@ -19,6 +19,8 @@ The objective of this project is to empower Company X with the capability to:
 ## Example Transaction History
 ![Example Transaction History](https://github.com/PiotrCheski/DemandForecasting/assets/61555492/2ec44bfb-8611-4a9e-93d5-d8b789262275)
 
+
+## Demo
 ![obraz](https://github.com/PiotrCheski/DemandForecasting/assets/61555492/62f16115-0612-4410-9cfa-89b99f918030)
 
 ![obraz](https://github.com/PiotrCheski/DemandForecasting/assets/61555492/cf52316a-1c78-48ef-b0f1-b301edc9dfa6)
