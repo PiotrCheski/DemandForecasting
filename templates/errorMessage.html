@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 
 {% block head %}
-    <title>Komunikat błędu</title>
+    <title>Error Message</title>
 {% endblock %}
 
 {% block body %}
 <div class="specific-file">
     {% if validation_columns_result %}
-        <h1>Przesłany plik: </h1>
+        <h1>Uploaded file:</h1>
         {{ filename }}
-        <h1>Brakujące kolumny:</h1>
+        <h1>Missing columns:</h1>
         {% for missing_column in validation_columns_result %}
             <li>{{ missing_column }}</li>
         {% endfor %}
     {% elif validation_types_result  %}
-        <h1>Przesłany plik: </h1>
+        <h1>Uploaded file:</h1>
         {{ filename }}
-        <h1>Niewłaściwy typ danych w kolumnie: {{ validation_types_result }}</h1>
+        <h1>Incorrect data type in column: {{ validation_types_result }}</h1>
     {% else %}
         <h1>{{ error_message }}</h1>
     {% endif %}

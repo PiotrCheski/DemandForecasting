@@ -6,24 +6,24 @@
 
 {% block body %}
 <div class="specific-file">
-    <h1 class="">Wybrane produkty:</h1>
+    <h1 class="">Selected products:</h1>
     <h1 class="">        
         {% for product in selected_products %}
         <li>{{ product }}</li>
         {% endfor %}
     </h1>
-    <h1 class="">Okres analizy:</h1>
+    <h1 class="">Analysis period:</h1>
     <h1 class="">  
-        <li> Od {{ start_month }}/{{ start_year }}</li>
-        <li> Do {{ end_month }}/{{ end_year }}</li>
+        <li> From {{ start_month }}/{{ start_year }}</li>
+        <li> To {{ end_month }}/{{ end_year }}</li>
     </h1>
-    <h3>Prognoza popytu dla kolejnego miesiąca metodą średnich ruchonych</h3>
+    <h3>Demand forecast for the next month using the moving averages method</h3>
     <div class="details-table">
         <table class="">
             <thead>
                 <tr>
-                    <th>Rok-Miesiąc</th>
-                    <th>Łączna wartość transakcji [zł/m-c]</th>
+                    <th>Year-Month</th>
+                    <th>Total transaction value [USD/month]</th>
                     <th>n = 3</th>
                     <th>n = 6</th>
                     <th>n = 9</th>
@@ -32,8 +32,8 @@
             <tbody>
                 {% for row in data %}
                     <tr>
-                        <td>{{ row['Data transakcji'] }}</td>
-                        <td>{{ row['Wartość'] }}</td>
+                        <td>{{ row['Transaction Date'] }}</td>
+                        <td>{{ row['Value'] }}</td>
                         <td>-</td>
                         <td>-</td>
                         <td>-</td>

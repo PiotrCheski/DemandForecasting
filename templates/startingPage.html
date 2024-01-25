@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <title>Demand Forecaster</title>
+{% endblock %}
+
+{% block body %}
+<div class="quarter-circle"></div>
+    <div class="title-main-page">
+    <h1>DEMAND<br>FORECASTING</h1>
+    </div>
+
+    <div class="buttons-main-page">
+        
+        <button onclick="window.location.href='{{ url_for('howWeWork') }}'">HOW WE WORK</button>
+
+        <button onclick="window.location.href='{{ url_for('chooseFile') }}'">UPLOAD YOUR<br>DATA</button>
+
+        <button onclick="window.location.href='{{ url_for('exploreFiles') }}'">VIEW YOUR<br>DATA</button>
+
+    </div>
+{% endblock %}

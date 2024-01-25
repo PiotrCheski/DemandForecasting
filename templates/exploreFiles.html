@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-    <title>Twój plik</title>
+    <title>Your files</title>
 {% endblock %}
 
 {% block body %}
@@ -14,7 +14,7 @@
                     <a href="{{ url_for('view_file', file_name=file) }}" class="file-link">{{ file }}</a>
                 </div>
                 <div class="delete-container">
-                    <a href="{{ url_for('delete_file', file_name=file) }}" class="delete-link" onclick="return confirm('Czy na pewno chcesz usunąć plik {{file}}?')">Usuń</a>
+                    <a href="{{ url_for('delete_file', file_name=file) }}" class="delete-link" onclick="return confirm('Are you sure you want to delete the file {{file}}?')">Delete</a>
                 </div>
             </div>
         </li>
@@ -22,10 +22,10 @@
 </ul>
 {% else %}
 <div class="no-files">
-<h1>Brak danych</h1>
+<h1>No data available</h1>
 
 
-<button id="submitButton" onclick="window.location.href='{{ url_for('chooseFile') }}'">PRZEŚLIJ SWOJE DANE</button>
+<button id="submitButton" onclick="window.location.href='{{ url_for('chooseFile') }}'">UPLOAD YOUR DATA</button>
 </div>
 {% endif %}
 
