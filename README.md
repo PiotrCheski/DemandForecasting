@@ -15,3 +15,6 @@ The objective of this project is to empower Company X with the capability to:
 
 1. **Forecast Product Demand:** Predict demand for products available in their online store.
 2. **Visualize Sales Data:** Create visual representations of data to facilitate business analyses.
+3. 
+## Example Transaction History
+![Example Transaction History](https://github.com/PiotrCheski/DemandForecasting/assets/61555492/2ec44bfb-8611-4a9e-93d5-d8b789262275)
