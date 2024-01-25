@@ -1,4 +1,4 @@
-# Sales Forecasting and Visualization Tool
+# Demand Forecasting
 
 Company X specializes in selling a diverse range of products through its online store. The IT system records transaction details for each product purchase in a .csv file, including:
 
