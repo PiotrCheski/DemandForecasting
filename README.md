@@ -20,5 +20,4 @@ The objective of this project is to empower Company X with the capability to:
 ![Example Transaction History](https://github.com/PiotrCheski/DemandForecasting/assets/61555492/2ec44bfb-8611-4a9e-93d5-d8b789262275)
 
 
-![obraz](https://github.com/PiotrCheski/DemandForecasting/assets/61555492/689d0386-a508-41eb-8e9b-d1dba46e5cc6)
 
