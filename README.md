@@ -1,13 +1,17 @@
-Company X is engaged in the sale of various products through its online store. Their IT system records transaction information in a .csv file for each product purchase, including:
+# Sales Forecasting and Visualization Tool
 
-    Transaction date
-    Category to which the sold product belongs
-    Product name
-    Quantity of the product purchased in a given transaction
-    Price per unit of the product
-    Transaction value
+Company X specializes in selling a diverse range of products through its online store. The IT system records transaction details for each product purchase in a .csv file, including:
 
-The accumulated transaction data can be the basis for conducting business analyses regarding the sale of products in the online store. Unfortunately, Company X does not have a tool that would allow visualization of the accumulated data or forecasting of product demand. The project's goal is to enable Company X to:
+- **Transaction Date**
+- **Product Category**
+- **Product Name**
+- **Quantity Purchased**
+- **Price Per Unit**
+- **Transaction Value**
 
-    Forecast demand for products offered in their online store
-    Visualize data related to the sale of products.
+## Project Objective
+
+The objective of this project is to empower Company X with the capability to:
+
+1. **Forecast Product Demand:** Predict demand for products available in their online store.
+2. **Visualize Sales Data:** Create visual representations of data to facilitate business analyses.
